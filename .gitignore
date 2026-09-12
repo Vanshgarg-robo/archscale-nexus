@@ -1,0 +1,67 @@
+# ==============================================================================
+# ArchScale Nexus — Global Git Ignore
+# ==============================================================================
+
+# --- Environment and Secret Files (NEVER COMMIT SECRETS) ---
+.env
+.env.*
+!.env.example
+*.env
+*.local
+secrets.json
+
+# --- Python & Backend ---
+backend/.venv/
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# --- Databases & SQLite files ---
+*.db
+*.sqlite
+*.sqlite3
+archscale.db
+backend/archscale.db
+
+# --- Node.js & Frontend ---
+node_modules/
+frontend/node_modules/
+frontend/.next/
+.next/
+out/
+frontend/out/
+build/
+frontend/build/
+.turbo/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- IDEs and Editors ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Logs & Temp Files ---
+*.log
+logs/
+tmp/
+temp/

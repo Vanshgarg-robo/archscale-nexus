@@ -1,0 +1,17 @@
+# Backend specific gitignore
+.env
+.env.*
+!.env.example
+*.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.db
+*.sqlite
+*.sqlite3
+archscale.db
+.pytest_cache/
+.coverage
+htmlcov/
