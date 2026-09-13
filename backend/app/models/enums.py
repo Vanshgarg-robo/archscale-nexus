@@ -126,4 +126,7 @@ class UserRole(str, enum.Enum):
     CLIENT = "client"
     VENDOR = "vendor"
     SITE_SUPERVISOR = "site_supervisor"
+    ANALYST = "analyst"
+    OPERATOR = "operator"
+    VIEWER = "viewer"
 

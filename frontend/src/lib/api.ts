@@ -144,4 +144,63 @@ export const api = {
     reset: () =>
       fetchApi<any>("/api/demo/reset", { method: "POST" }),
   },
+  admin: {
+    dashboard: () => fetchApi<any>("/api/admin/dashboard"),
+    systemHealth: () => fetchApi<any>("/api/admin/system-health"),
+    users: {
+      list: (params?: { page?: number; page_size?: number; search?: string; role?: string; status?: string; sort_by?: string; sort_order?: string }) => {
+        const searchParams = new URLSearchParams();
+        if (params?.page) searchParams.set("page", String(params.page));
+        if (params?.page_size) searchParams.set("page_size", String(params.page_size));
+        if (params?.search) searchParams.set("search", params.search);
+        if (params?.role) searchParams.set("role", params.role);
+        if (params?.status) searchParams.set("status", params.status);
+        if (params?.sort_by) searchParams.set("sort_by", params.sort_by);
+        if (params?.sort_order) searchParams.set("sort_order", params.sort_order);
+        const qs = searchParams.toString();
+        return fetchApi<any>(`/api/admin/users${qs ? `?${qs}` : ""}`);
+      },
+      get: (id: number) => fetchApi<any>(`/api/admin/users/${id}`),
+      create: (data: { email: string; password: string; full_name: string; role?: string; username?: string }) =>
+        fetchApi<any>("/api/admin/users", { method: "POST", body: JSON.stringify(data) }),
+      update: (id: number, data: { email?: string; username?: string; full_name?: string; role?: string; is_active?: boolean; avatar_url?: string }) =>
+        fetchApi<any>(`/api/admin/users/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+      delete: (id: number) =>
+        fetchApi<any>(`/api/admin/users/${id}`, { method: "DELETE" }),
+      toggleStatus: (id: number) =>
+        fetchApi<any>(`/api/admin/users/${id}/toggle-status`, { method: "POST" }),
+      resetPassword: (id: number, newPassword: string) =>
+        fetchApi<any>(`/api/admin/users/${id}/reset-password`, { method: "POST", body: JSON.stringify({ new_password: newPassword }) }),
+    },
+    roles: {
+      list: () => fetchApi<any[]>("/api/admin/roles"),
+      get: (role: string) => fetchApi<any>(`/api/admin/roles/${role}`),
+    },
+    auditLogs: {
+      list: (params?: { page?: number; page_size?: number; search?: string; action?: string; user_id?: number; status?: string }) => {
+        const searchParams = new URLSearchParams();
+        if (params?.page) searchParams.set("page", String(params.page));
+        if (params?.page_size) searchParams.set("page_size", String(params.page_size));
+        if (params?.search) searchParams.set("search", params.search);
+        if (params?.action) searchParams.set("action", params.action);
+        if (params?.user_id) searchParams.set("user_id", String(params.user_id));
+        if (params?.status) searchParams.set("status", params.status);
+        const qs = searchParams.toString();
+        return fetchApi<any>(`/api/admin/audit-logs${qs ? `?${qs}` : ""}`);
+      },
+    },
+    notifications: {
+      list: (params?: { limit?: number; offset?: number; unread_only?: boolean }) => {
+        const searchParams = new URLSearchParams();
+        if (params?.limit) searchParams.set("limit", String(params.limit));
+        if (params?.offset) searchParams.set("offset", String(params.offset));
+        if (params?.unread_only) searchParams.set("unread_only", "true");
+        const qs = searchParams.toString();
+        return fetchApi<any>(`/api/admin/notifications${qs ? `?${qs}` : ""}`);
+      },
+      unreadCount: () => fetchApi<{ unread_count: number }>("/api/admin/notifications/unread-count"),
+      markRead: (id: number) => fetchApi<any>(`/api/admin/notifications/${id}/read`, { method: "PATCH" }),
+      markAllRead: () => fetchApi<any>("/api/admin/notifications/mark-all-read", { method: "POST" }),
+    },
+  },
 };

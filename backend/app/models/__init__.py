@@ -18,6 +18,9 @@ from app.models.notification import Notification
 from app.models.audit_event import AuditEvent
 from app.models.health_snapshot import HealthSnapshot
 from app.models.knowledge_graph import KnowledgeGraphNode, KnowledgeGraphEdge
+from app.models.admin_audit_log import AdminAuditLog
+from app.models.admin_notification import AdminNotification
+from app.models.session import Session
 from app.models.enums import (
     StakeholderRole, TaskStatus, TaskPriority, RelationshipType,
     ApprovalStatus, ChangeRequestStatus, IssueSeverity, IssueStatus,
@@ -31,6 +34,7 @@ __all__ = [
     "ChangeRequest", "Vendor", "Document", "Risk", "ActionItem",
     "Meeting", "Conversation", "Notification", "AuditEvent",
     "HealthSnapshot", "KnowledgeGraphNode", "KnowledgeGraphEdge",
+    "AdminAuditLog", "AdminNotification", "Session",
     "StakeholderRole", "TaskStatus", "TaskPriority",
     "RelationshipType", "ApprovalStatus", "ChangeRequestStatus",
     "IssueSeverity", "IssueStatus", "RiskCategory", "RiskSeverity",

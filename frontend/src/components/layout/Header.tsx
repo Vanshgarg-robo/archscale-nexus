@@ -17,11 +17,20 @@ export default function Header() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showPersonaMenu, setShowPersonaMenu] = useState(false);
   const [switching, setSwitching] = useState(false);
+  const [adminUnreadCount, setAdminUnreadCount] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     api.notifications.list(projectId).then(setNotifications).catch(() => {});
   }, [projectId]);
+
+  useEffect(() => {
+    if (user?.role === "admin") {
+      api.admin.notifications.unreadCount()
+        .then((res) => setAdminUnreadCount(res.unread_count))
+        .catch(() => {});
+    }
+  }, [user]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -135,6 +144,22 @@ export default function Header() {
           <span>💬</span>
           <span>AI PM Chat</span>
         </Link>
+
+        {/* Admin Notifications Badge */}
+        {user?.role === "admin" && (
+          <Link
+            href="/admin/notifications"
+            title="Admin Notifications"
+            className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-300 hover:text-white transition-colors text-xs sm:text-sm"
+          >
+            <span>⬡</span>
+            {adminUnreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-mono rounded-full flex items-center justify-center font-bold animate-pulse">
+                {adminUnreadCount}
+              </span>
+            )}
+          </Link>
+        )}
 
         {/* Dark/Light Mode Toggle */}
         <button

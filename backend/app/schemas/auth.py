@@ -55,7 +55,10 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "manage_users", "manage_organization", "manage_projects",
         "manage_stakeholders", "manage_tasks", "manage_approvals",
         "manage_change_requests", "manage_risks", "view_analytics",
-        "manage_ai", "manage_settings",
+        "manage_ai", "manage_settings", "manage_radar_nodes",
+        "view_audit_logs", "manage_system_settings", "view_radar_data",
+        "generate_reports", "export_reports", "view_dashboards",
+        "manage_radar_operations", "view_targets", "view_reports",
     ],
     "project_manager": [
         "manage_projects", "manage_stakeholders", "manage_tasks",
@@ -85,6 +88,19 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
     "site_supervisor": [
         "view_projects", "manage_tasks", "view_approvals",
         "view_change_requests", "view_analytics",
+    ],
+    "analyst": [
+        "view_radar_data", "generate_reports", "export_reports",
+        "view_dashboards", "view_analytics", "view_projects",
+        "view_tasks", "view_approvals", "view_change_requests",
+    ],
+    "operator": [
+        "manage_radar_operations", "view_dashboards", "view_targets",
+        "view_radar_data", "view_projects", "view_tasks",
+    ],
+    "viewer": [
+        "view_dashboards", "view_reports", "view_projects",
+        "view_tasks", "view_approvals",
     ],
 }
 

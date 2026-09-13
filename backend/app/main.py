@@ -7,6 +7,7 @@ from app.api import projects, stakeholders, tasks, dependencies, approvals
 from app.api import change_requests, risks, health, notifications
 from app.api import impact, blockers, conversations, ai_chat, graph, dashboard, memory, demo
 from app.api import auth
+from app.api import admin_users, admin_roles, admin_audit, admin_notifications, admin_dashboard
 
 
 @asynccontextmanager
@@ -63,6 +64,11 @@ app.include_router(graph.router)
 app.include_router(dashboard.router)
 app.include_router(memory.router)
 app.include_router(demo.router)
+app.include_router(admin_users.router)
+app.include_router(admin_roles.router)
+app.include_router(admin_audit.router)
+app.include_router(admin_notifications.router)
+app.include_router(admin_dashboard.router)
 
 
 @app.get("/api/ping")

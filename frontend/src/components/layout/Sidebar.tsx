@@ -3,6 +3,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { useMobileNavStore } from "@/store/mobile-nav-store";
+import { useAuthStore } from "@/store/auth-store";
 
 interface NavSection {
   title: string;
@@ -53,10 +54,24 @@ const navSections: NavSection[] = [
   },
 ];
 
+const adminNavSection: NavSection = {
+  title: "Administration",
+  items: [
+    { href: "/admin", label: "Admin Dashboard", icon: "⬡" },
+    { href: "/admin/users", label: "User Management", icon: "◉" },
+    { href: "/admin/roles", label: "Role Management", icon: "◇" },
+    { href: "/admin/audit-logs", label: "Audit Logs", icon: "☵" },
+    { href: "/admin/notifications", label: "Notifications", icon: "🔔" },
+    { href: "/admin/monitoring", label: "System Monitor", icon: "◐" },
+    { href: "/admin/settings", label: "Settings", icon: "⚙" },
+  ],
+};
+
 export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const { isOpen, close } = useMobileNavStore();
+  const user = useAuthStore((s) => s.user);
 
   const handleNavClick = () => {
     if (isOpen) close();
@@ -102,7 +117,7 @@ export default function Sidebar() {
 
         {/* Navigation Sections */}
         <nav className="flex-1 py-3 overflow-y-auto space-y-4 custom-scrollbar">
-          {navSections.map((section, sIdx) => (
+          {[...navSections, ...(user?.role === "admin" ? [adminNavSection] : [])].map((section, sIdx) => (
             <div key={sIdx} className="space-y-1">
               {(!collapsed || isOpen) && (
                 <p className="px-4 text-[10px] font-bold text-slate-300 uppercase tracking-wider">

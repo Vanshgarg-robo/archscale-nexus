@@ -224,3 +224,105 @@ export interface ExtractionResult {
   deadlines: Array<Record<string, unknown>>;
   summary: string;
 }
+
+export interface AdminUser {
+  id: number;
+  email: string;
+  username: string | null;
+  full_name: string;
+  role: string;
+  organization_id: number;
+  organization_name: string | null;
+  avatar_url: string | null;
+  is_active: boolean;
+  is_superadmin: boolean;
+  stakeholder_id: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+  last_login_at: string | null;
+}
+
+export interface AdminUserListResponse {
+  users: AdminUser[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+export interface AuditLog {
+  id: number;
+  user_id: number;
+  user_name: string | null;
+  user_email: string | null;
+  action: string;
+  resource_type: string;
+  resource_id: number | null;
+  ip_address: string | null;
+  status: string;
+  details: Record<string, unknown> | null;
+  created_at: string | null;
+}
+
+export interface AuditLogListResponse {
+  logs: AuditLog[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+export interface AdminNotification {
+  id: number;
+  user_id: number | null;
+  notification_type: string;
+  title: string;
+  message: string | null;
+  is_read: boolean;
+  created_at: string | null;
+}
+
+export interface AdminNotificationListResponse {
+  notifications: AdminNotification[];
+  total: number;
+  unread_count: number;
+}
+
+export interface RolePermission {
+  role: string;
+  permissions: string[];
+  user_count: number;
+}
+
+export interface SystemHealth {
+  server_uptime_seconds: number;
+  database_connected: boolean;
+  database_response_ms: number;
+  api_status: string;
+  total_users: number;
+  active_users: number;
+  online_sessions: number;
+  radar_nodes_connected: number;
+  targets_tracked: number;
+  alerts_generated: number;
+  reports_generated: number;
+  error_count: number;
+  memory_usage_mb: number;
+  cpu_usage_percent: number;
+}
+
+export interface AdminDashboardData {
+  total_users: number;
+  active_users: number;
+  online_users: number;
+  radar_nodes: number;
+  targets_tracked: number;
+  alerts_generated: number;
+  reports_generated: number;
+  database_status: string;
+  server_health: string;
+  api_health: string;
+  recent_audit_logs: AuditLog[];
+  recent_notifications: AdminNotification[];
+  users_by_role: Record<string, number>;
+}
