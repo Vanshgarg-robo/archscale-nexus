@@ -2,6 +2,8 @@ import { create } from "zustand";
 
 export interface DemoPersona {
   email: string;
+  username: string;
+  mobile_no: string;
   name: string;
   role: string;
   title: string;
@@ -11,13 +13,44 @@ export interface DemoPersona {
 export const DEMO_PERSONAS: DemoPersona[] = [
   {
     email: "admin@archscale.io",
+    username: "admin",
+    mobile_no: "+1 (555) 234-5678",
     name: "Alexander Wright",
     role: "admin",
     title: "Managing Principal / Admin",
     avatarColor: "from-purple-500 to-indigo-600",
   },
   {
+    email: "analyst@archscale.io",
+    username: "analyst",
+    mobile_no: "+1 (555) 345-6789",
+    name: "Aria Chen",
+    role: "analyst",
+    title: "Radar Intelligence Analyst",
+    avatarColor: "from-cyan-500 to-blue-600",
+  },
+  {
+    email: "operator@archscale.io",
+    username: "operator",
+    mobile_no: "+1 (555) 456-7890",
+    name: "Marcus Vance",
+    role: "operator",
+    title: "Radar Operations Specialist",
+    avatarColor: "from-teal-500 to-emerald-600",
+  },
+  {
+    email: "viewer@archscale.io",
+    username: "viewer",
+    mobile_no: "+1 (555) 567-8901",
+    name: "Elena Rostova",
+    role: "viewer",
+    title: "Executive Viewer / Observer",
+    avatarColor: "from-slate-500 to-zinc-600",
+  },
+  {
     email: "arjun@archscale.io",
+    username: "arjun",
+    mobile_no: "+91-98765-43218",
     name: "Arjun Reddy",
     role: "project_manager",
     title: "Senior Project Director",
@@ -25,6 +58,8 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   },
   {
     email: "ananya@archscale.io",
+    username: "ananya",
+    mobile_no: "+91-98765-43211",
     name: "Ananya Sharma",
     role: "architect",
     title: "Lead Principal Architect",
@@ -32,6 +67,8 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   },
   {
     email: "priya@elecdesign.com",
+    username: "priya",
+    mobile_no: "+91-98765-43214",
     name: "Priya Nair",
     role: "engineer",
     title: "Lead Electrical & MEP Engineer",
@@ -39,6 +76,8 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   },
   {
     email: "deepak@buildpro.com",
+    username: "deepak",
+    mobile_no: "+91-98765-43215",
     name: "Deepak Singh",
     role: "contractor",
     title: "General Contractor (BuildPro)",
@@ -46,6 +85,8 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   },
   {
     email: "rajiv@client.com",
+    username: "rajiv",
+    mobile_no: "+91-98765-43210",
     name: "Rajiv Mehra",
     role: "client",
     title: "Principal Property Owner",
@@ -53,6 +94,8 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   },
   {
     email: "amit@furnishcraft.com",
+    username: "amit",
+    mobile_no: "+91-98765-43216",
     name: "Amit Gupta",
     role: "vendor",
     title: "FurnishCraft Millwork Vendor",
@@ -60,6 +103,8 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   },
   {
     email: "mohan@buildpro.com",
+    username: "mohan",
+    mobile_no: "+91-98765-43219",
     name: "Mohan Das",
     role: "site_supervisor",
     title: "Senior Field Site Supervisor",
@@ -67,9 +112,11 @@ export const DEMO_PERSONAS: DemoPersona[] = [
   },
 ];
 
-interface UserProfile {
+export interface UserProfile {
   id: number;
   email: string;
+  username?: string;
+  mobile_no?: string;
   full_name: string;
   role: string;
   organization_id: number;
@@ -94,9 +141,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     ? JSON.parse(localStorage.getItem("archscale_user")!)
     : {
         id: 1,
-        email: "ananya@archscale.io",
-        full_name: "Ananya Sharma",
-        role: "architect",
+        email: "admin@archscale.io",
+        username: "admin",
+        mobile_no: "+1 (555) 234-5678",
+        full_name: "Alexander Wright",
+        role: "admin",
         organization_id: 1,
         organization_name: "ArchScale Design Studio",
         is_active: true,

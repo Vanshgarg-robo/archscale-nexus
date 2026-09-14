@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
+import FloatingAIAssistant from "@/components/ai-assistant/FloatingAIAssistant";
 
 export const metadata: Metadata = {
   title: "ArchScale Nexus — Coordination Intelligence Platform",
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           <main className="flex-1 p-3 sm:p-6 animate-fade-in max-w-full overflow-x-hidden">{children}</main>
         </div>
+        <FloatingAIAssistant />
       </body>
     </html>
   );

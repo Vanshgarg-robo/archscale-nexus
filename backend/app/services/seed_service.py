@@ -6,6 +6,7 @@ from app.models import (
     Task, Dependency, Approval, Decision, ChangeRequest,
     Vendor, Risk, ActionItem, Meeting, Notification,
     AuditEvent, HealthSnapshot, Issue, Conversation,
+    AdminAuditLog, AdminNotification,
 )
 from app.models.enums import (
     StakeholderRole, TaskStatus, TaskPriority, RelationshipType,
@@ -80,23 +81,29 @@ async def seed_demo_data(db: AsyncSession) -> dict:
         stakeholders.append(s)
     await db.flush()
 
-    # 4. Pre-seeded Users for all 8 RBAC roles (Password: password123)
+    # 4. Pre-seeded Users for all RBAC roles (Password: password123)
     users_data = [
-        ("admin@archscale.io", "Alexander Wright", "admin", None),
-        ("arjun@archscale.io", "Arjun Reddy", "project_manager", stakeholders[8].id),
-        ("ananya@archscale.io", "Ananya Sharma", "architect", stakeholders[1].id),
-        ("priya@elecdesign.com", "Priya Nair", "engineer", stakeholders[4].id),
-        ("deepak@buildpro.com", "Deepak Singh", "contractor", stakeholders[5].id),
-        ("rajiv@client.com", "Rajiv Mehra", "client", stakeholders[0].id),
-        ("amit@furnishcraft.com", "Amit Gupta", "vendor", stakeholders[6].id),
-        ("mohan@buildpro.com", "Mohan Das", "site_supervisor", stakeholders[9].id),
+        ("admin@archscale.io", "Alexander Wright", "admin", None, "+1 (555) 234-5678"),
+        ("analyst@archscale.io", "Aria Chen", "analyst", None, "+1 (555) 345-6789"),
+        ("operator@archscale.io", "Marcus Vance", "operator", None, "+1 (555) 456-7890"),
+        ("viewer@archscale.io", "Elena Rostova", "viewer", None, "+1 (555) 567-8901"),
+        ("arjun@archscale.io", "Arjun Reddy", "project_manager", stakeholders[8].id, "+91-98765-43218"),
+        ("ananya@archscale.io", "Ananya Sharma", "architect", stakeholders[1].id, "+91-98765-43211"),
+        ("priya@elecdesign.com", "Priya Nair", "engineer", stakeholders[4].id, "+91-98765-43214"),
+        ("deepak@buildpro.com", "Deepak Singh", "contractor", stakeholders[5].id, "+91-98765-43215"),
+        ("rajiv@client.com", "Rajiv Mehra", "client", stakeholders[0].id, "+91-98765-43210"),
+        ("amit@furnishcraft.com", "Amit Gupta", "vendor", stakeholders[6].id, "+91-98765-43216"),
+        ("mohan@buildpro.com", "Mohan Das", "site_supervisor", stakeholders[9].id, "+91-98765-43219"),
     ]
 
     common_hashed_pw = hash_password("password123")
-    for email, full_name, role, stk_id in users_data:
+    for email, full_name, role, stk_id, phone in users_data:
+        uname = email.split("@")[0]
         user = User(
             organization_id=org.id,
             email=email,
+            username=uname,
+            mobile_no=phone,
             hashed_password=common_hashed_pw,
             full_name=full_name,
             role=role,
@@ -734,6 +741,36 @@ Rajiv Mehra: Send them over by Thursday and I will sign off before the weekend."
             changes=changes,
         )
         db.add(ae)
+    await db.flush()
+
+    # 19. Admin Audit Logs & Notifications
+    admin_user = await db.execute(select(User).where(User.role == "admin").limit(1))
+    admin_obj = admin_user.scalar_one_or_none()
+    admin_id = admin_obj.id if admin_obj else 1
+
+    admin_audit_data = [
+        ("system_initialized", "system", None, "127.0.0.1", "success", {"version": "1.0.0", "module": "admin"}),
+        ("user_created", "user", 2, "192.168.1.10", "success", {"email": "analyst@archscale.io", "role": "analyst"}),
+        ("role_assigned", "role", 3, "192.168.1.10", "success", {"role": "operator", "user": "Marcus Vance"}),
+        ("radar_scan_triggered", "radar", None, "10.0.0.5", "success", {"frequency": "high", "nodes_responding": 4}),
+        ("security_policy_updated", "system", None, "127.0.0.1", "success", {"mfa_enforced": True, "session_timeout_min": 30}),
+    ]
+    for action, rtype, rid, ip, st, det in admin_audit_data:
+        db.add(AdminAuditLog(
+            user_id=admin_id, action=action, resource_type=rtype,
+            resource_id=rid, ip_address=ip, status=st, details=det,
+        ))
+
+    admin_notifs = [
+        ("security", "Security Audit Completed", "All user roles and access tokens validated with zero anomalies detected.", False),
+        ("system", "Radar Node Cluster Synced", "All primary and secondary radar arrays reporting healthy telemetry.", False),
+        ("user", "New Operators Provisioned", "Operator Marcus Vance has been activated on the live telemetry stream.", True),
+    ]
+    for ntype, title, msg, is_r in admin_notifs:
+        db.add(AdminNotification(
+            user_id=admin_id, notification_type=ntype, title=title,
+            message=msg, is_read=is_r,
+        ))
     await db.flush()
 
     return {

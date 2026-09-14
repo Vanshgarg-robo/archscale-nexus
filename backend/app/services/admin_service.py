@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.user import User
-from app.models.organization import Organization
 from app.services.auth_service import hash_password
 import math
 
@@ -27,6 +26,7 @@ async def list_users(
                 User.full_name.ilike(search_term),
                 User.email.ilike(search_term),
                 User.username.ilike(search_term),
+                User.mobile_no.ilike(search_term),
             )
         )
 
@@ -78,6 +78,7 @@ async def create_user(
     full_name: str,
     role: str = "viewer",
     username: str | None = None,
+    mobile_no: str | None = None,
 ) -> User:
     existing = await db.execute(select(User).where(User.email == email))
     if existing.scalar_one_or_none():
@@ -91,6 +92,7 @@ async def create_user(
     user = User(
         email=email,
         username=username,
+        mobile_no=mobile_no,
         hashed_password=hash_password(password),
         full_name=full_name,
         role=role,
@@ -106,6 +108,7 @@ async def update_user(
     user: User,
     email: str | None = None,
     username: str | None = None,
+    mobile_no: str | None = None,
     full_name: str | None = None,
     role: str | None = None,
     is_active: bool | None = None,
@@ -123,6 +126,8 @@ async def update_user(
             raise ValueError("Username already taken")
         user.username = username
 
+    if mobile_no is not None:
+        user.mobile_no = mobile_no
     if full_name is not None:
         user.full_name = full_name
     if role is not None:

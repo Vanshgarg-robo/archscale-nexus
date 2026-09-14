@@ -1,7 +1,5 @@
 import time
 import os
-import platform
-from datetime import datetime, timezone
 from sqlalchemy import select, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.user import User

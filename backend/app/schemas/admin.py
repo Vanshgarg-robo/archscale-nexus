@@ -5,6 +5,7 @@ from datetime import datetime
 class AdminUserCreate(BaseModel):
     email: str = Field(..., min_length=5, max_length=255)
     username: str | None = Field(None, min_length=3, max_length=100)
+    mobile_no: str | None = Field(None, max_length=30)
     password: str = Field(..., min_length=8, max_length=128)
     full_name: str = Field(..., min_length=1, max_length=255)
     role: str = Field(default="viewer")
@@ -13,6 +14,7 @@ class AdminUserCreate(BaseModel):
 class AdminUserUpdate(BaseModel):
     email: str | None = None
     username: str | None = None
+    mobile_no: str | None = None
     full_name: str | None = None
     role: str | None = None
     is_active: bool | None = None
@@ -23,6 +25,7 @@ class AdminUserResponse(BaseModel):
     id: int
     email: str
     username: str | None = None
+    mobile_no: str | None = None
     full_name: str
     role: str
     organization_id: int

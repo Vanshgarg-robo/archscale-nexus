@@ -18,6 +18,7 @@ def _user_to_response(user: User) -> AdminUserResponse:
         id=user.id,
         email=user.email,
         username=user.username,
+        mobile_no=user.mobile_no,
         full_name=user.full_name,
         role=user.role,
         organization_id=user.organization_id,
@@ -93,6 +94,7 @@ async def create_user(
             full_name=data.full_name,
             role=data.role,
             username=data.username,
+            mobile_no=data.mobile_no,
         )
         await audit_service.log_event(
             db=db,
@@ -135,6 +137,7 @@ async def update_user(
             user=user,
             email=data.email,
             username=data.username,
+            mobile_no=data.mobile_no,
             full_name=data.full_name,
             role=data.role,
             is_active=data.is_active,

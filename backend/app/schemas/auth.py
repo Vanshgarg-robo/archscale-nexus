@@ -4,14 +4,18 @@ from datetime import datetime
 
 class UserRegister(BaseModel):
     email: str = Field(..., min_length=5, max_length=255)
-    password: str = Field(..., min_length=8, max_length=128)
+    username: str | None = Field(None, min_length=3, max_length=100)
+    mobile_no: str | None = Field(None, max_length=30)
+    password: str = Field(..., min_length=6, max_length=128)
     full_name: str = Field(..., min_length=1, max_length=255)
-    organization_name: str = Field(..., min_length=1, max_length=255)
-    role: str = Field(default="project_manager")
+    organization_name: str = Field(default="ArchScale Nexus Studio", min_length=1, max_length=255)
+    role: str = Field(default="viewer")
 
 
 class UserLogin(BaseModel):
-    email: str
+    email: str | None = None
+    username: str | None = None
+    username_or_email: str | None = None
     password: str
 
 
@@ -29,6 +33,8 @@ class RefreshTokenRequest(BaseModel):
 class UserResponse(BaseModel):
     id: int
     email: str
+    username: str | None = None
+    mobile_no: str | None = None
     full_name: str
     role: str
     organization_id: int
@@ -44,8 +50,15 @@ class UserResponse(BaseModel):
 
 class UserUpdate(BaseModel):
     full_name: str | None = None
+    username: str | None = None
+    mobile_no: str | None = None
     avatar_url: str | None = None
     role: str | None = None
+
+
+class PasswordChangeRequest(BaseModel):
+    current_password: str
+    new_password: str = Field(..., min_length=6, max_length=128)
 
 
 # ─── RBAC Permissions ──────────────────────────────────────────────

@@ -69,13 +69,25 @@ async def register_user(
     password: str,
     full_name: str,
     organization_name: str,
-    role: str = "project_manager",
+    role: str = "viewer",
+    username: str | None = None,
+    mobile_no: str | None = None,
 ) -> User:
     """Register a new user, creating their organization if needed."""
-    # Check if email already exists
-    result = await db.execute(select(User).where(User.email == email))
-    if result.scalar_one_or_none():
-        raise ValueError("Email already registered")
+    from sqlalchemy import or_
+    if username:
+        result = await db.execute(select(User).where(or_(User.email == email, User.username == username)))
+    else:
+        result = await db.execute(select(User).where(User.email == email))
+    existing = result.scalar_one_or_none()
+    if existing:
+        if existing.email == email:
+            raise ValueError("Email already registered")
+        if username and existing.username == username:
+            raise ValueError("Username already taken")
+
+    if not username:
+        username = email.split("@")[0]
 
     # Find or create organization
     org_result = await db.execute(
@@ -90,6 +102,8 @@ async def register_user(
     # Create user
     user = User(
         email=email,
+        username=username,
+        mobile_no=mobile_no,
         hashed_password=hash_password(password),
         full_name=full_name,
         role=role,
@@ -100,9 +114,18 @@ async def register_user(
     return user
 
 
-async def authenticate_user(db: AsyncSession, email: str, password: str) -> User | None:
-    """Authenticate a user by email and password."""
-    result = await db.execute(select(User).where(User.email == email))
+async def authenticate_user(db: AsyncSession, username_or_email: str, password: str) -> User | None:
+    """Authenticate a user by email OR username and password."""
+    from sqlalchemy import or_
+    result = await db.execute(
+        select(User).where(
+            or_(
+                User.email == username_or_email,
+                User.username == username_or_email,
+                User.mobile_no == username_or_email,
+            )
+        )
+    )
     user = result.scalar_one_or_none()
     if not user or not verify_password(password, user.hashed_password):
         return None

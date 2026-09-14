@@ -103,13 +103,13 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
         {METRIC_CARDS.map(({ key, label, icon, color }) => {
           const c = colorMap[color];
-          const value = data[key as keyof AdminDashboardData];
+          const value = data[key as keyof AdminDashboardData] as number;
           return (
             <div key={key} className={`bg-gradient-to-br ${c.bg} border ${c.border} rounded-xl p-4 transition-all duration-200 hover:scale-[1.02]`}>
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-[10px] text-slate-500 uppercase tracking-wider font-medium">{label}</p>
-                  <p className={`text-2xl font-bold mt-1 ${c.text}`}>{typeof value === "number" ? value.toLocaleString() : value}</p>
+                  <p className={`text-2xl font-bold mt-1 ${c.text}`}>{value.toLocaleString()}</p>
                 </div>
                 <span className="text-lg opacity-40">{icon}</span>
               </div>

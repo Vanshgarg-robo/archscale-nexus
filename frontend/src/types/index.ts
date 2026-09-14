@@ -225,10 +225,28 @@ export interface ExtractionResult {
   summary: string;
 }
 
+export interface User {
+  id: number;
+  email: string;
+  username: string | null;
+  mobile_no: string | null;
+  full_name: string;
+  role: string;
+  organization_id: number;
+  organization_name?: string | null;
+  avatar_url?: string | null;
+  is_active: boolean;
+  is_superadmin?: boolean;
+  stakeholder_id?: number | null;
+  created_at?: string | null;
+  last_login_at?: string | null;
+}
+
 export interface AdminUser {
   id: number;
   email: string;
   username: string | null;
+  mobile_no: string | null;
   full_name: string;
   role: string;
   organization_id: number;

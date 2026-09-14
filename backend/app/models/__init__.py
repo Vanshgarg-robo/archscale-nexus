@@ -21,6 +21,12 @@ from app.models.knowledge_graph import KnowledgeGraphNode, KnowledgeGraphEdge
 from app.models.admin_audit_log import AdminAuditLog
 from app.models.admin_notification import AdminNotification
 from app.models.session import Session
+from app.models.ai_assistant import (
+    AIAssistantSession,
+    AIAssistantMessage,
+    AIAssistantConfig,
+    AIAssistantUsage,
+)
 from app.models.enums import (
     StakeholderRole, TaskStatus, TaskPriority, RelationshipType,
     ApprovalStatus, ChangeRequestStatus, IssueSeverity, IssueStatus,
@@ -35,6 +41,7 @@ __all__ = [
     "Meeting", "Conversation", "Notification", "AuditEvent",
     "HealthSnapshot", "KnowledgeGraphNode", "KnowledgeGraphEdge",
     "AdminAuditLog", "AdminNotification", "Session",
+    "AIAssistantSession", "AIAssistantMessage", "AIAssistantConfig", "AIAssistantUsage",
     "StakeholderRole", "TaskStatus", "TaskPriority",
     "RelationshipType", "ApprovalStatus", "ChangeRequestStatus",
     "IssueSeverity", "IssueStatus", "RiskCategory", "RiskSeverity",

@@ -6,13 +6,13 @@ from app.models.user import User
 from app.schemas.auth import (
     UserRegister, UserLogin, TokenResponse,
     RefreshTokenRequest, UserResponse, UserUpdate,
-    get_permissions,
+    PasswordChangeRequest, get_permissions,
 )
 from app.services.auth_service import (
     register_user, authenticate_user, create_token_pair,
     store_refresh_token, decode_token, get_user_by_id,
     verify_refresh_token, invalidate_refresh_token,
-    hash_password,
+    hash_password, verify_password,
 )
 
 router = APIRouter(tags=["Authentication"])
@@ -29,6 +29,8 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
             full_name=data.full_name,
             organization_name=data.organization_name,
             role=data.role,
+            username=data.username,
+            mobile_no=data.mobile_no,
         )
         await db.commit()
         await db.refresh(user)
@@ -44,12 +46,19 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
 
 @router.post("/login", response_model=TokenResponse)
 async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
-    """Authenticate a user and return tokens."""
-    user = await authenticate_user(db, data.email, data.password)
+    """Authenticate a user by username or email and return tokens."""
+    identifier = data.username_or_email or data.username or data.email
+    if not identifier:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username or email is required",
+        )
+
+    user = await authenticate_user(db, identifier, data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
+            detail="Invalid credentials. Verify your username/email and password.",
         )
 
     tokens = create_token_pair(user)
@@ -115,6 +124,8 @@ async def get_me(user: User = Depends(get_current_user)):
     return UserResponse(
         id=user.id,
         email=user.email,
+        username=user.username,
+        mobile_no=user.mobile_no,
         full_name=user.full_name,
         role=user.role,
         organization_id=user.organization_id,
@@ -145,9 +156,16 @@ async def update_me(
     """Update the current user's profile."""
     if data.full_name is not None:
         user.full_name = data.full_name
+    if data.mobile_no is not None:
+        user.mobile_no = data.mobile_no
+    if data.username is not None and data.username != user.username:
+        from sqlalchemy import select
+        res = await db.execute(select(User).where(User.username == data.username, User.id != user.id))
+        if res.scalar_one_or_none():
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username already taken")
+        user.username = data.username
     if data.avatar_url is not None:
         user.avatar_url = data.avatar_url
-    # Role changes are admin-only, silently ignored here
     await db.commit()
     await db.refresh(user)
 
@@ -155,6 +173,8 @@ async def update_me(
     return UserResponse(
         id=user.id,
         email=user.email,
+        username=user.username,
+        mobile_no=user.mobile_no,
         full_name=user.full_name,
         role=user.role,
         organization_id=user.organization_id,
@@ -165,6 +185,23 @@ async def update_me(
         created_at=user.created_at,
         last_login_at=user.last_login_at,
     )
+
+
+@router.post("/change-password")
+async def change_password(
+    data: PasswordChangeRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Change the current user's password."""
+    if not verify_password(data.current_password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect",
+        )
+    user.hashed_password = hash_password(data.new_password)
+    await db.commit()
+    return {"message": "Password changed successfully"}
 
 
 # Export routers with both /api/auth and /auth prefixes

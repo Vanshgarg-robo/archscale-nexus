@@ -8,12 +8,33 @@ from app.api import change_requests, risks, health, notifications
 from app.api import impact, blockers, conversations, ai_chat, graph, dashboard, memory, demo
 from app.api import auth
 from app.api import admin_users, admin_roles, admin_audit, admin_notifications, admin_dashboard
+from app.api import ai_assistant
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Automatic column migration for existing tables
+        from sqlalchemy import text
+        try:
+            await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(100)"))
+        except Exception:
+            try:
+                await conn.execute(text("ALTER TABLE users ADD COLUMN username VARCHAR(100)"))
+            except Exception:
+                pass
+        try:
+            await conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS ix_users_username ON users (username)"))
+        except Exception:
+            pass
+        try:
+            await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS mobile_no VARCHAR(30)"))
+        except Exception:
+            try:
+                await conn.execute(text("ALTER TABLE users ADD COLUMN mobile_no VARCHAR(30)"))
+            except Exception:
+                pass
 
     from app.database import async_session
     from app.services.seed_service import seed_demo_data
@@ -69,6 +90,7 @@ app.include_router(admin_roles.router)
 app.include_router(admin_audit.router)
 app.include_router(admin_notifications.router)
 app.include_router(admin_dashboard.router)
+app.include_router(ai_assistant.router)
 
 
 @app.get("/api/ping")

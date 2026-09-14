@@ -21,6 +21,7 @@ const navSections: NavSection[] = [
     title: "Overview",
     items: [
       { href: "/", label: "Executive Command", icon: "⬡" },
+      { href: "/user", label: "User Profile (/user)", icon: "👤", badge: "USER" },
     ],
   },
   {
@@ -62,6 +63,7 @@ const adminNavSection: NavSection = {
     { href: "/admin/roles", label: "Role Management", icon: "◇" },
     { href: "/admin/audit-logs", label: "Audit Logs", icon: "☵" },
     { href: "/admin/notifications", label: "Notifications", icon: "🔔" },
+    { href: "/admin/ai-assistant", label: "AI Assistant Controls", icon: "🤖", badge: "AI" },
     { href: "/admin/monitoring", label: "System Monitor", icon: "◐" },
     { href: "/admin/settings", label: "Settings", icon: "⚙" },
   ],

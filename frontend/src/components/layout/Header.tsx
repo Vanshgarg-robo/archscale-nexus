@@ -95,6 +95,12 @@ export default function Header() {
         return "bg-pink-500/15 text-pink-400 border-pink-500/30";
       case "vendor":
         return "bg-violet-500/15 text-violet-400 border-violet-500/30";
+      case "analyst":
+        return "bg-cyan-500/15 text-cyan-400 border-cyan-500/30";
+      case "operator":
+        return "bg-teal-500/15 text-teal-400 border-teal-500/30";
+      case "viewer":
+        return "bg-slate-500/15 text-slate-400 border-slate-500/30";
       default:
         return "bg-slate-500/15 text-slate-400 border-slate-500/30";
     }
@@ -160,6 +166,15 @@ export default function Header() {
             )}
           </Link>
         )}
+
+        {/* Direct Link to User Profile Route /user */}
+        <Link
+          href="/user"
+          title="User Account & Coordinates (/user)"
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 hover:text-white hover:bg-orange-500/20 transition-all text-xs sm:text-sm"
+        >
+          <span>👤</span>
+        </Link>
 
         {/* Dark/Light Mode Toggle */}
         <button
@@ -256,17 +271,45 @@ export default function Header() {
             <div className="absolute right-0 top-12 w-80 bg-[#0C1222] border border-slate-800 rounded-2xl shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95">
               <div className="pb-3 border-b border-slate-800/80 px-2 pt-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-bold text-white truncate">{user?.full_name}</p>
+                  <Link
+                    href="/user"
+                    onClick={() => setShowPersonaMenu(false)}
+                    className="text-xs font-bold text-white hover:text-orange-400 transition-colors truncate"
+                  >
+                    {user?.full_name || "User Profile"}
+                  </Link>
                   <span
                     className={`text-[9px] font-mono px-1.5 py-0.2 rounded border uppercase font-bold ${getRoleBadgeColor(
                       user?.role
                     )}`}
                   >
-                    {user?.role}
+                    {user?.role || "USER"}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-0.5">{user?.email}</p>
-                <p className="text-[10px] text-slate-500 font-mono mt-0.5">Org: ArchScale Design Studio</p>
+                <div className="flex items-center gap-2 mt-1">
+                  {user?.username && (
+                    <span className="text-[10px] text-orange-400 font-mono font-semibold">
+                      @{user.username}
+                    </span>
+                  )}
+                  <span className="text-[11px] text-slate-400 truncate">{user?.email}</span>
+                </div>
+                {user?.mobile_no && (
+                  <p className="text-[10px] text-slate-400 font-mono mt-0.5 flex items-center gap-1">
+                    <span>📞</span>
+                    <span>{user.mobile_no}</span>
+                  </p>
+                )}
+                <div className="mt-2 pt-1">
+                  <Link
+                    href="/user"
+                    onClick={() => setShowPersonaMenu(false)}
+                    className="w-full py-1.5 px-3 rounded-lg bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/30 text-orange-300 hover:text-orange-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    <span>👤</span>
+                    <span>Manage User Profile (/user)</span>
+                  </Link>
+                </div>
               </div>
 
               <div className="pt-2">
@@ -296,8 +339,11 @@ export default function Header() {
                           {p.name.charAt(0)}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-semibold text-xs text-white truncate">{p.name}</p>
-                          <p className="text-[10px] text-slate-400 truncate">{p.title}</p>
+                          <div className="flex items-center justify-between gap-1">
+                            <p className="font-semibold text-xs text-white truncate">{p.name}</p>
+                            <span className="text-[9px] text-orange-400/90 font-mono">@{p.username}</span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 truncate">{p.title} • {p.mobile_no}</p>
                         </div>
                         {isCurrent && <span className="text-orange-400 text-xs font-bold">✓</span>}
                       </button>
