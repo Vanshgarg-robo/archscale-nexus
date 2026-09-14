@@ -18,8 +18,13 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 bcrypt==4.2.1
 
-# AI - Gemini
+# AI - Providers
 google-genai==1.14.0
+openai>=1.50.0
+
+# System Monitoring
+psutil>=5.9.0
 
 # HTTP
 httpx==0.28.1
+
