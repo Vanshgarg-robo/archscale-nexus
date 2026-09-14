@@ -1,0 +1,13 @@
+.git
+.github
+frontend
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.venv
+venv
+archscale.db
+.env
+.env.local
+.DS_Store
