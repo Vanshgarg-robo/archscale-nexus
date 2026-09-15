@@ -61,6 +61,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
+    allow_origin_regex=r"https://.*\.onrender\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -91,6 +92,17 @@ app.include_router(admin_audit.router)
 app.include_router(admin_notifications.router)
 app.include_router(admin_dashboard.router)
 app.include_router(ai_assistant.router)
+
+
+@app.get("/")
+async def root():
+    return {
+        "status": "online",
+        "service": "ArchScale Nexus API",
+        "version": "1.0.0",
+        "docs_url": "/docs",
+        "health": "/api/ping",
+    }
 
 
 @app.get("/api/ping")
