@@ -25,10 +25,10 @@ class Task(Base):
 
     project: Mapped["Project"] = relationship(back_populates="tasks", lazy="selectin")
     assignee: Mapped["Stakeholder | None"] = relationship(back_populates="assigned_tasks", lazy="selectin")
-    dependencies_as_source: Mapped[list["Dependency"]] = relationship(back_populates="source_task", foreign_keys="Dependency.source_id", lazy="selectin")
-    dependencies_as_target: Mapped[list["Dependency"]] = relationship(back_populates="target_task", foreign_keys="Dependency.target_id", lazy="selectin")
-    approvals: Mapped[list["Approval"]] = relationship(back_populates="related_task", lazy="selectin")
-    issues: Mapped[list["Issue"]] = relationship(back_populates="related_task", lazy="selectin")
+    dependencies_as_source: Mapped[list["Dependency"]] = relationship(back_populates="source_task", foreign_keys="Dependency.source_id")
+    dependencies_as_target: Mapped[list["Dependency"]] = relationship(back_populates="target_task", foreign_keys="Dependency.target_id")
+    approvals: Mapped[list["Approval"]] = relationship(back_populates="related_task")
+    issues: Mapped[list["Issue"]] = relationship(back_populates="related_task")
 
 
 from app.models.project import Project

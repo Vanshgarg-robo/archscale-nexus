@@ -16,9 +16,9 @@ class Organization(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    projects: Mapped[list["Project"]] = relationship(back_populates="organization", lazy="selectin")
-    stakeholders: Mapped[list["Stakeholder"]] = relationship(back_populates="organization", lazy="selectin")
-    users: Mapped[list["User"]] = relationship(back_populates="organization", lazy="selectin")
+    projects: Mapped[list["Project"]] = relationship(back_populates="organization")
+    stakeholders: Mapped[list["Stakeholder"]] = relationship(back_populates="organization")
+    users: Mapped[list["User"]] = relationship(back_populates="organization")
 
 
 from app.models.project import Project

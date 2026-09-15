@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Query, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any
+from datetime import datetime, timezone
 
 from app.database import get_db
 from app.deps import get_current_user_optional, get_current_user
@@ -116,6 +117,7 @@ async def chat_non_stream(
         current_page=body.current_page,
         project_id=body.project_id,
     )
+    session_uuid = session.session_uuid
 
     import json
     import time
@@ -145,7 +147,7 @@ async def chat_non_stream(
     elapsed = (time.time() - start) * 1000.0
 
     return ChatResponse(
-        session_uuid=session.session_uuid,
+        session_uuid=session_uuid,
         message=ChatMessageResponse(
             id=0,
             role="assistant",
@@ -153,7 +155,7 @@ async def chat_non_stream(
             tokens_used=tokens_total,
             model_used="nexus-architecture-engine",
             page_context=body.current_page,
-            created_at=session.updated_at,
+            created_at=datetime.now(timezone.utc),
         ),
         tokens_total=tokens_total,
         response_time_ms=round(elapsed, 2),

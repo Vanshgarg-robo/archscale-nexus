@@ -23,15 +23,15 @@ class Project(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     organization: Mapped["Organization"] = relationship(back_populates="projects", lazy="selectin")
-    tasks: Mapped[list["Task"]] = relationship(back_populates="project", lazy="selectin")
-    stakeholder_assignments: Mapped[list["ProjectStakeholder"]] = relationship(back_populates="project", lazy="selectin")
-    change_requests: Mapped[list["ChangeRequest"]] = relationship(back_populates="project", lazy="selectin")
-    risks: Mapped[list["Risk"]] = relationship(back_populates="project", lazy="selectin")
-    health_snapshots: Mapped[list["HealthSnapshot"]] = relationship(back_populates="project", lazy="selectin")
-    meetings: Mapped[list["Meeting"]] = relationship(back_populates="project", lazy="selectin")
-    decisions: Mapped[list["Decision"]] = relationship(back_populates="project", lazy="selectin")
-    notifications: Mapped[list["Notification"]] = relationship(back_populates="project", lazy="selectin")
-    audit_events: Mapped[list["AuditEvent"]] = relationship(back_populates="project", lazy="selectin")
+    tasks: Mapped[list["Task"]] = relationship(back_populates="project")
+    stakeholder_assignments: Mapped[list["ProjectStakeholder"]] = relationship(back_populates="project")
+    change_requests: Mapped[list["ChangeRequest"]] = relationship(back_populates="project")
+    risks: Mapped[list["Risk"]] = relationship(back_populates="project")
+    health_snapshots: Mapped[list["HealthSnapshot"]] = relationship(back_populates="project")
+    meetings: Mapped[list["Meeting"]] = relationship(back_populates="project")
+    decisions: Mapped[list["Decision"]] = relationship(back_populates="project")
+    notifications: Mapped[list["Notification"]] = relationship(back_populates="project")
+    audit_events: Mapped[list["AuditEvent"]] = relationship(back_populates="project")
 
 
 class ProjectStakeholder(Base):

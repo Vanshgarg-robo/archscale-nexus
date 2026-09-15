@@ -1,309 +1,260 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const token = typeof window !== "undefined" ? localStorage.getItem("archscale_token") : null;
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    ...(options?.headers as Record<string, string>),
-  };
+export class ApiError extends Error {
+  status: number;
+  data?: unknown;
 
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+  constructor(message: string, status: number, data?: unknown) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.data = data;
   }
+}
 
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
+type RequestOptions = RequestInit & { auth?: boolean };
+
+function getAuthToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("archscale_token");
+}
+
+async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const { auth = true, headers, ...init } = options;
+  const token = getAuthToken();
+
+  const response = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(auth && token ? { Authorization: `Bearer ${token}` } : {}),
+      ...headers,
+    },
   });
 
-  if (!res.ok) {
-    let errorDetail = res.statusText;
+  if (response.status === 204) return undefined as T;
+
+  if (!response.ok) {
+    let errorDetail = `Request failed (${response.status})`;
+    let body: any = null;
     try {
-      const errJson = await res.json();
-      if (errJson.detail) errorDetail = typeof errJson.detail === "string" ? errJson.detail : JSON.stringify(errJson.detail);
-    } catch {}
-    throw new Error(`API error ${res.status}: ${errorDetail}`);
+      body = await response.json();
+      if (typeof body.detail === "string") {
+        errorDetail = body.detail;
+      } else if (Array.isArray(body.detail)) {
+        // FastAPI / Pydantic 422 validation errors
+        errorDetail = body.detail
+          .map((err: any) => (err.loc ? `${err.loc.slice(1).join(".")}: ${err.msg}` : err.msg || JSON.stringify(err)))
+          .join("; ");
+      } else if (body.message) {
+        errorDetail = body.message;
+      }
+    } catch {
+      // response is not JSON
+    }
+    throw new ApiError(errorDetail, response.status, body);
   }
 
-  return res.json();
+  return response.json() as Promise<T>;
 }
+
+const json = (method: "POST" | "PATCH" | "PUT" | "DELETE", body?: unknown) => ({
+  method,
+  body: body === undefined ? undefined : JSON.stringify(body),
+});
 
 export const api = {
   auth: {
-    login: (data: { email?: string; username?: string; username_or_email?: string; password: string }) =>
-      fetchApi<{ access_token: string; refresh_token: string; token_type: string; expires_in: number }>("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    register: (data: { email: string; password: string; full_name: string; organization_name?: string; role?: string; username?: string; mobile_no?: string }) =>
-      fetchApi<{ access_token: string; refresh_token: string; token_type: string; expires_in: number }>("/api/auth/register", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    me: () => fetchApi<any>("/api/auth/me"),
-    updateProfile: (data: { full_name?: string; username?: string; mobile_no?: string; avatar_url?: string }) =>
-      fetchApi<any>("/api/auth/me", {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      }),
-    changePassword: (data: { current_password: string; new_password: string }) =>
-      fetchApi<{ message: string }>("/api/auth/change-password", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    permissions: () => fetchApi<{ role: string; permissions: string[] }>("/api/auth/permissions"),
-    logout: () => fetchApi<{ message: string }>("/api/auth/logout", { method: "POST" }),
-    refresh: (refresh_token: string) =>
-      fetchApi<{ access_token: string; refresh_token: string }>("/api/auth/refresh", {
-        method: "POST",
-        body: JSON.stringify({ refresh_token }),
-      }),
-  },
-  dashboard: {
-    get: (projectId: number) => fetchApi<any>(`/api/dashboard/${projectId}`),
+    login: (username_or_email: string, password: string) =>
+      request<any>("/api/auth/login", { ...json("POST", { username_or_email, password }), auth: false }),
+    register: (body: Record<string, unknown>) =>
+      request<any>("/api/auth/register", { ...json("POST", body), auth: false }),
+    me: () => request<any>("/api/auth/me"),
+    permissions: () => request<any>("/api/auth/permissions"),
+    update: (body: Record<string, unknown>) => request<any>("/api/auth/me", json("PATCH", body)),
+    password: (body: Record<string, unknown>) => request<any>("/api/auth/change-password", json("POST", body)),
+    logout: () => request<any>("/api/auth/logout", json("POST")),
   },
   projects: {
-    list: () => fetchApi<any[]>("/api/projects"),
-    get: (id: number) => fetchApi<any>(`/api/projects/${id}`),
+    list: () => request<any[]>("/api/projects"),
+    get: (id: number) => request<any>(`/api/projects/${id}`),
+    create: (body: Record<string, unknown>) => request<any>("/api/projects", json("POST", body)),
   },
+  dashboard: (id: number) => request<any>(`/api/dashboard/${id}`),
   stakeholders: {
-    list: (projectId: number) => fetchApi<any[]>(`/api/stakeholders/project/${projectId}`),
-    matrix: (projectId: number) => fetchApi<any[]>(`/api/stakeholders/matrix/${projectId}`),
-    workloads: (projectId: number) => fetchApi<any[]>(`/api/stakeholders/workload/${projectId}`),
+    list: (id: number) => request<any[]>(`/api/stakeholders/project/${id}`),
+    matrix: (id: number) => request<any[]>(`/api/stakeholders/matrix/${id}`),
+    workloads: (id: number) => request<any[]>(`/api/stakeholders/workload/${id}`),
   },
   tasks: {
-    list: (projectId: number) => fetchApi<any[]>(`/api/tasks/project/${projectId}`),
-    create: (data: any) =>
-      fetchApi<any>("/api/tasks", { method: "POST", body: JSON.stringify(data) }),
-    update: (taskId: number, data: any) =>
-      fetchApi<any>(`/api/tasks/${taskId}`, { method: "PATCH", body: JSON.stringify(data) }),
+    list: (id: number) => request<any[]>(`/api/tasks/project/${id}`),
+    create: (body: Record<string, unknown>) => request<any>("/api/tasks", json("POST", body)),
+    update: (id: number, body: Record<string, unknown>) => request<any>(`/api/tasks/${id}`, json("PATCH", body)),
   },
   dependencies: {
-    list: (projectId: number) => fetchApi<any[]>(`/api/dependencies/project/${projectId}`),
-    downstream: (taskId: number) => fetchApi<any[]>(`/api/dependencies/downstream/${taskId}`),
-    criticalPath: (projectId: number) => fetchApi<any[]>(`/api/dependencies/critical-path/${projectId}`),
-    create: (data: { source_id: number; target_id: number; relationship_type?: string }) =>
-      fetchApi<any>("/api/dependencies", { method: "POST", body: JSON.stringify(data) }),
+    list: (id: number) => request<any[]>(`/api/dependencies/project/${id}`),
+    critical: (id: number) => request<any[]>(`/api/dependencies/critical-path/${id}`),
   },
   approvals: {
-    pending: (projectId: number) => fetchApi<any[]>(`/api/approvals/pending/${projectId}`),
-    overdue: (projectId: number) => fetchApi<any[]>(`/api/approvals/overdue/${projectId}`),
-    history: (projectId: number) => fetchApi<any[]>(`/api/approvals/history/${projectId}`),
-    update: (id: number, data: any) =>
-      fetchApi<any>(`/api/approvals/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+    pending: (id: number) => request<any[]>(`/api/approvals/pending/${id}`),
+    history: (id: number) => request<any[]>(`/api/approvals/history/${id}`),
+    update: (id: number, body: Record<string, unknown>) => request<any>(`/api/approvals/${id}`, json("PATCH", body)),
   },
-  changeRequests: {
-    list: (projectId: number) => fetchApi<any[]>(`/api/change-requests/project/${projectId}`),
-    create: (data: any) =>
-      fetchApi<any>("/api/change-requests", { method: "POST", body: JSON.stringify(data) }),
-    updateStatus: (id: number, data: any) =>
-      fetchApi<any>(`/api/change-requests/${id}/status`, { method: "PATCH", body: JSON.stringify(data) }),
+  changes: {
+    list: (id: number) => request<any[]>(`/api/change-requests/project/${id}`),
+    create: (body: Record<string, unknown>) => request<any>("/api/change-requests", json("POST", body)),
+    status: (id: number, status: string) => request<any>(`/api/change-requests/${id}/status`, json("PATCH", { status })),
   },
   risks: {
-    list: (projectId: number) => fetchApi<any[]>(`/api/risks/project/${projectId}`),
-    summary: (projectId: number) => fetchApi<any>(`/api/risks/summary/${projectId}`),
+    list: (id: number) => request<any[]>(`/api/risks/project/${id}`),
+    summary: (id: number) => request<any>(`/api/risks/summary/${id}`),
   },
   health: {
-    current: (projectId: number) => fetchApi<any>(`/api/health/${projectId}`),
-    history: (projectId: number) => fetchApi<any[]>(`/api/health/history/${projectId}`),
+    current: (id: number) => request<any>(`/api/health/${id}`),
+    history: (id: number) => request<any[]>(`/api/health/history/${id}`),
   },
-  blockers: {
-    list: (projectId: number) => fetchApi<any[]>(`/api/blockers/${projectId}`),
-  },
+  blockers: (id: number) => request<any[]>(`/api/blockers/${id}`),
   notifications: {
-    list: (projectId: number) => fetchApi<any[]>(`/api/notifications/project/${projectId}`),
-    markRead: (id: number) => fetchApi<any>(`/api/notifications/${id}/read`, { method: "PATCH" }),
+    list: (id: number) => request<any[]>(`/api/notifications/project/${id}`),
+    read: (id: number) => request<any>(`/api/notifications/${id}/read`, json("PATCH")),
   },
-  impact: {
-    analyze: (data: { project_id: number; change_description: string; affected_task_ids?: number[] }) =>
-      fetchApi<{
-        affected_stakeholders: any[];
-        affected_tasks: any[];
-        affected_vendors: any[];
-        affected_approvals: any[];
-        blocked_work: any[];
-        risk_level: string;
-        estimated_delay_days: number;
-        recommendations: string[];
-        coordination_notes?: string;
-      }>("/api/impact/analyze", { method: "POST", body: JSON.stringify(data) }),
-  },
-  graph: {
-    get: (projectId: number) => fetchApi<any>(`/api/graph/${projectId}`),
-  },
+  graph: (id: number) => request<any>(`/api/graph/${id}`),
+  impact: (body: Record<string, unknown>) => request<any>("/api/impact/analyze", json("POST", body)),
   ai: {
-    chat: (data: { project_id: number; message: string; history?: any[] }) =>
-      fetchApi<{ response: string; sources?: string[] }>("/api/ai/chat", { method: "POST", body: JSON.stringify(data) }),
-    summarize: (data: { project_id: number; summary_type: string }) =>
-      fetchApi<any>("/api/ai/summarize", { method: "POST", body: JSON.stringify(data) }),
-    simulate: (data: { project_id: number; scenario: string }) =>
-      fetchApi<any>("/api/ai/simulate", { method: "POST", body: JSON.stringify(data) }),
+    chat: (body: Record<string, unknown>) => request<any>("/api/ai/chat", json("POST", body)),
+    simulate: (body: Record<string, unknown>) => request<any>("/api/ai/simulate", json("POST", body)),
+    summarize: (body: Record<string, unknown>) => request<any>("/api/ai/summarize", json("POST", body)),
   },
+  memory: (body: Record<string, unknown>) => request<any>("/api/memory/search", json("POST", body)),
   conversations: {
-    list: (projectId: number) => fetchApi<any[]>(`/api/conversations/${projectId}`),
-    upload: (data: { project_id: number; source_type: string; content: string; title?: string }) =>
-      fetchApi<any>("/api/conversations/upload", { method: "POST", body: JSON.stringify(data) }),
-  },
-  memory: {
-    search: (data: { project_id: number; query: string }) =>
-      fetchApi<any>("/api/memory/search", { method: "POST", body: JSON.stringify(data) }),
+    list: (id: number) => request<any[]>(`/api/conversations/${id}`),
+    upload: (body: Record<string, unknown>) => request<any>("/api/conversations/upload", json("POST", body)),
   },
   demo: {
-    triggerKitchenRedesign: () =>
-      fetchApi<any>("/api/demo/kitchen-redesign", { method: "POST" }),
-    reset: () =>
-      fetchApi<any>("/api/demo/reset", { method: "POST" }),
+    kitchen: () => request<any>("/api/demo/kitchen-redesign", json("POST")),
+    reset: () => request<any>("/api/demo/reset", json("POST")),
   },
   admin: {
-    dashboard: () => fetchApi<any>("/api/admin/dashboard"),
-    systemHealth: () => fetchApi<any>("/api/admin/system-health"),
-    users: {
-      list: (params?: { page?: number; page_size?: number; search?: string; role?: string; status?: string; sort_by?: string; sort_order?: string }) => {
-        const searchParams = new URLSearchParams();
-        if (params?.page) searchParams.set("page", String(params.page));
-        if (params?.page_size) searchParams.set("page_size", String(params.page_size));
-        if (params?.search) searchParams.set("search", params.search);
-        if (params?.role) searchParams.set("role", params.role);
-        if (params?.status) searchParams.set("status", params.status);
-        if (params?.sort_by) searchParams.set("sort_by", params.sort_by);
-        if (params?.sort_order) searchParams.set("sort_order", params.sort_order);
-        const qs = searchParams.toString();
-        return fetchApi<any>(`/api/admin/users${qs ? `?${qs}` : ""}`);
-      },
-      get: (id: number) => fetchApi<any>(`/api/admin/users/${id}`),
-      create: (data: { email: string; password: string; full_name: string; role?: string; username?: string }) =>
-        fetchApi<any>("/api/admin/users", { method: "POST", body: JSON.stringify(data) }),
-      update: (id: number, data: { email?: string; username?: string; full_name?: string; role?: string; is_active?: boolean; avatar_url?: string }) =>
-        fetchApi<any>(`/api/admin/users/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
-      delete: (id: number) =>
-        fetchApi<any>(`/api/admin/users/${id}`, { method: "DELETE" }),
-      toggleStatus: (id: number) =>
-        fetchApi<any>(`/api/admin/users/${id}/toggle-status`, { method: "POST" }),
-      resetPassword: (id: number, newPassword: string) =>
-        fetchApi<any>(`/api/admin/users/${id}/reset-password`, { method: "POST", body: JSON.stringify({ new_password: newPassword }) }),
+    dashboard: () => request<any>("/api/admin/dashboard"),
+    system: () => request<any>("/api/admin/system-health"),
+    users: (params?: { search?: string; role?: string; status?: string; page?: number; page_size?: number }) => {
+      const searchParams = new URLSearchParams();
+      if (params?.search) searchParams.set("search", params.search);
+      if (params?.role) searchParams.set("role", params.role);
+      if (params?.status) searchParams.set("status", params.status);
+      if (params?.page) searchParams.set("page", String(params.page));
+      if (params?.page_size) searchParams.set("page_size", String(params.page_size));
+      const qs = searchParams.toString();
+      return request<any>(`/api/admin/users${qs ? `?${qs}` : ""}`);
     },
-    roles: {
-      list: () => fetchApi<any[]>("/api/admin/roles"),
-      get: (role: string) => fetchApi<any>(`/api/admin/roles/${role}`),
+    createUser: (body: Record<string, unknown>) => request<any>("/api/admin/users", json("POST", body)),
+    updateUser: (id: number, body: Record<string, unknown>) => request<any>(`/api/admin/users/${id}`, json("PATCH", body)),
+    deleteUser: (id: number) => request<any>(`/api/admin/users/${id}`, json("DELETE")),
+    toggleUser: (id: number) => request<any>(`/api/admin/users/${id}/toggle-status`, json("POST")),
+    resetPassword: (id: number, new_password: string) =>
+      request<any>(`/api/admin/users/${id}/reset-password`, json("POST", { new_password })),
+    roles: () => request<any[]>("/api/admin/roles"),
+    audits: (params?: { search?: string; action?: string; status?: string; page?: number }) => {
+      const searchParams = new URLSearchParams();
+      if (params?.search) searchParams.set("search", params.search);
+      if (params?.action) searchParams.set("action", params.action);
+      if (params?.status) searchParams.set("status", params.status);
+      if (params?.page) searchParams.set("page", String(params.page));
+      const qs = searchParams.toString();
+      return request<any>(`/api/admin/audit-logs${qs ? `?${qs}` : ""}`);
     },
-    auditLogs: {
-      list: (params?: { page?: number; page_size?: number; search?: string; action?: string; user_id?: number; status?: string }) => {
-        const searchParams = new URLSearchParams();
-        if (params?.page) searchParams.set("page", String(params.page));
-        if (params?.page_size) searchParams.set("page_size", String(params.page_size));
-        if (params?.search) searchParams.set("search", params.search);
-        if (params?.action) searchParams.set("action", params.action);
-        if (params?.user_id) searchParams.set("user_id", String(params.user_id));
-        if (params?.status) searchParams.set("status", params.status);
-        const qs = searchParams.toString();
-        return fetchApi<any>(`/api/admin/audit-logs${qs ? `?${qs}` : ""}`);
-      },
-    },
-    notifications: {
-      list: (params?: { limit?: number; offset?: number; unread_only?: boolean }) => {
-        const searchParams = new URLSearchParams();
-        if (params?.limit) searchParams.set("limit", String(params.limit));
-        if (params?.offset) searchParams.set("offset", String(params.offset));
-        if (params?.unread_only) searchParams.set("unread_only", "true");
-        const qs = searchParams.toString();
-        return fetchApi<any>(`/api/admin/notifications${qs ? `?${qs}` : ""}`);
-      },
-      unreadCount: () => fetchApi<{ unread_count: number }>("/api/admin/notifications/unread-count"),
-      markRead: (id: number) => fetchApi<any>(`/api/admin/notifications/${id}/read`, { method: "PATCH" }),
-      markAllRead: () => fetchApi<any>("/api/admin/notifications/mark-all-read", { method: "POST" }),
-    },
+    notifications: (unread_only = false) =>
+      request<any>(`/api/admin/notifications?unread_only=${unread_only}`),
+    unreadCount: () => request<{ unread_count: number }>("/api/admin/notifications/unread-count"),
+    readAdminNotification: (id: number) => request<any>(`/api/admin/notifications/${id}/read`, json("PATCH")),
+    markAllRead: () => request<any>("/api/admin/notifications/mark-all-read", json("POST")),
   },
-  aiAssistant: {
-    getConfig: () =>
-      fetchApi<{ is_enabled: boolean; model_name: string; suggested_prompts: string[] }>("/api/ai-assistant/config"),
-    getSessions: () =>
-      fetchApi<Array<{ id: number; session_uuid: string; title: string; current_page?: string; message_count: number; created_at: string; updated_at: string }>>("/api/ai-assistant/sessions"),
-    getSession: (sessionUuid: string) =>
-      fetchApi<{ id: number; session_uuid: string; title: string; current_page?: string; messages: Array<{ id: number; role: string; content: string; tokens_used?: number; model_used?: string; page_context?: string; created_at: string }> }>(`/api/ai-assistant/sessions/${sessionUuid}`),
-    createSession: (page?: string) =>
-      fetchApi<any>(`/api/ai-assistant/sessions${page ? `?page=${encodeURIComponent(page)}` : ""}`, { method: "POST" }),
-    deleteSession: (sessionUuid: string) =>
-      fetchApi<{ message: string }>(`/api/ai-assistant/sessions/${sessionUuid}`, { method: "DELETE" }),
-    chat: (data: { message: string; session_id?: string; current_page?: string; project_id?: number }) =>
-      fetchApi<any>("/api/ai-assistant/chat", { method: "POST", body: JSON.stringify(data) }),
-    chatStream: async (
-      data: { message: string; session_id?: string; current_page?: string; project_id?: number },
+  assistant: {
+    config: () => request<any>("/api/ai-assistant/config", { auth: false }),
+    chat: (body: Record<string, unknown>) => request<any>("/api/ai-assistant/chat", json("POST", body)),
+    sessions: () => request<any[]>("/api/ai-assistant/sessions"),
+    createSession: (page = "/") => request<any>(`/api/ai-assistant/sessions?page=${encodeURIComponent(page)}`, json("POST")),
+    sessionDetail: (uuid: string) => request<any>(`/api/ai-assistant/sessions/${uuid}`),
+    deleteSession: (uuid: string) => request<any>(`/api/ai-assistant/sessions/${uuid}`, json("DELETE")),
+    usage: () => request<any>("/api/ai-assistant/admin/usage"),
+    configAdmin: () => request<any>("/api/ai-assistant/admin/config"),
+    updateConfig: (body: Record<string, unknown>) => request<any>("/api/ai-assistant/admin/config", json("PUT", body)),
+
+    /**
+     * Streams tokens via Server-Sent Events (SSE) from /api/ai-assistant/chat/stream.
+     * Yields parsed token chunks to callbacks and handles done/error events.
+     */
+    streamChat: async (
+      body: { message: string; session_id?: string; current_page?: string; project_id?: number },
       callbacks: {
-        onInit?: (data: { session_uuid: string; title: string; current_page?: string }) => void;
-        onToken?: (token: string) => void;
-        onStatus?: (statusText: string) => void;
-        onError?: (error: string) => void;
-        onDone?: (info: { session_uuid: string; tokens_total: number; response_time_ms: number }) => void;
+        onInit?: (session: { session_uuid: string; title: string }) => void;
+        onToken: (chunk: string) => void;
+        onDone: (totalTokens: number) => void;
+        onError: (error: Error) => void;
       },
       signal?: AbortSignal
     ) => {
-      const token = typeof window !== "undefined" ? localStorage.getItem("archscale_token") : null;
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const token = getAuthToken();
+      try {
+        const response = await fetch(`${API_URL}/api/ai-assistant/chat/stream`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(body),
+          signal,
+        });
 
-      const res = await fetch(`${API_BASE}/api/ai-assistant/chat/stream`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(data),
-        signal,
-      });
-
-      if (!res.ok) {
-        let err = res.statusText;
-        try {
-          const j = await res.json();
-          if (j.detail) err = j.detail;
-        } catch {}
-        throw new Error(err);
-      }
-
-      if (!res.body) throw new Error("No response body");
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n\n");
-        buffer = lines.pop() || "";
-
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith("data: ")) continue;
-          const jsonStr = trimmed.slice(6);
-          if (jsonStr === "[DONE]") {
-            continue;
-          }
-          try {
-            const parsed = JSON.parse(jsonStr);
-            if (parsed.type === "token") callbacks.onToken?.(parsed.content);
-            else if (parsed.type === "init") callbacks.onInit?.(parsed);
-            else if (parsed.type === "status") callbacks.onStatus?.(parsed.content);
-            else if (parsed.type === "error") callbacks.onError?.(parsed.content);
-            else if (parsed.type === "done") callbacks.onDone?.(parsed);
-          } catch {}
+        if (!response.ok) {
+          const errText = await response.text().catch(() => "");
+          throw new Error(`Streaming failed (${response.status}): ${errText}`);
         }
+
+        if (!response.body) {
+          throw new Error("ReadableStream not supported by browser environment");
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || !trimmed.startsWith("data:")) continue;
+
+            const dataStr = trimmed.replace(/^data:\s*/, "");
+            if (dataStr === "[DONE]") {
+              return;
+            }
+
+            try {
+              const event = JSON.parse(dataStr);
+              if (event.type === "init" && callbacks.onInit) {
+                callbacks.onInit(event);
+              } else if (event.type === "token") {
+                callbacks.onToken(event.content || "");
+              } else if (event.type === "done") {
+                callbacks.onDone(event.tokens_total || 0);
+              } else if (event.type === "error") {
+                callbacks.onError(new Error(event.content || "AI assistant encountered an error"));
+              }
+            } catch {
+              // Ignore non-json lines
+            }
+          }
+        }
+      } catch (err) {
+        callbacks.onError(err instanceof Error ? err : new Error(String(err)));
       }
-    },
-    admin: {
-      getConfig: () =>
-        fetchApi<any>("/api/ai-assistant/admin/config"),
-      updateConfig: (data: { is_enabled?: boolean; model_name?: string; provider?: string; temperature?: number; max_tokens?: number; system_prompt?: string; rate_limit_per_minute?: number }) =>
-        fetchApi<any>("/api/ai-assistant/admin/config", { method: "PUT", body: JSON.stringify(data) }),
-      getConversations: (params?: { search?: string; limit?: number; offset?: number }) => {
-        const searchParams = new URLSearchParams();
-        if (params?.search) searchParams.set("search", params.search);
-        if (params?.limit) searchParams.set("limit", String(params.limit));
-        if (params?.offset) searchParams.set("offset", String(params.offset));
-        const qs = searchParams.toString();
-        return fetchApi<{ conversations: any[]; total: number; limit: number; offset: number }>(`/api/ai-assistant/admin/conversations${qs ? `?${qs}` : ""}`);
-      },
-      getUsage: () =>
-        fetchApi<{ total_sessions: number; total_messages: number; total_tokens: number; avg_latency_ms: number; popular_routes: Array<{ route: string; count: number }>; daily_usage: Array<{ date: string; queries: number; tokens: number }> }>("/api/ai-assistant/admin/usage"),
     },
   },
 };

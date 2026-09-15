@@ -22,12 +22,12 @@ class Stakeholder(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     organization: Mapped["Organization"] = relationship(back_populates="stakeholders", lazy="selectin")
-    project_assignments: Mapped[list["ProjectStakeholder"]] = relationship(back_populates="stakeholder", lazy="selectin")
-    assigned_tasks: Mapped[list["Task"]] = relationship(back_populates="assignee", lazy="selectin")
-    requested_approvals: Mapped[list["Approval"]] = relationship(back_populates="requester", foreign_keys="Approval.requester_id", lazy="selectin")
-    reviewing_approvals: Mapped[list["Approval"]] = relationship(back_populates="approver", foreign_keys="Approval.approver_id", lazy="selectin")
-    decisions_made: Mapped[list["Decision"]] = relationship(back_populates="decided_by_stakeholder", lazy="selectin")
-    action_items: Mapped[list["ActionItem"]] = relationship(back_populates="owner", lazy="selectin")
+    project_assignments: Mapped[list["ProjectStakeholder"]] = relationship(back_populates="stakeholder")
+    assigned_tasks: Mapped[list["Task"]] = relationship(back_populates="assignee")
+    requested_approvals: Mapped[list["Approval"]] = relationship(back_populates="requester", foreign_keys="Approval.requester_id")
+    reviewing_approvals: Mapped[list["Approval"]] = relationship(back_populates="approver", foreign_keys="Approval.approver_id")
+    decisions_made: Mapped[list["Decision"]] = relationship(back_populates="decided_by_stakeholder")
+    action_items: Mapped[list["ActionItem"]] = relationship(back_populates="owner")
 
 
 from app.models.organization import Organization
