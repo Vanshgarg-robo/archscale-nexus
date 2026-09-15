@@ -19,11 +19,43 @@ function getAuthToken(): string | null {
   return localStorage.getItem("archscale_token");
 }
 
+let refreshPromise: Promise<string | null> | null = null;
+
+async function doRefreshToken(): Promise<string | null> {
+  if (typeof window === "undefined") return null;
+  const refreshToken = localStorage.getItem("archscale_refresh_token");
+  if (!refreshToken) return null;
+
+  try {
+    const res = await fetch(`${API_URL}/api/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+    if (!res.ok) {
+      localStorage.removeItem("archscale_token");
+      localStorage.removeItem("archscale_refresh_token");
+      return null;
+    }
+    const data = await res.json();
+    if (data.access_token) {
+      localStorage.setItem("archscale_token", data.access_token);
+      if (data.refresh_token) {
+        localStorage.setItem("archscale_refresh_token", data.refresh_token);
+      }
+      return data.access_token as string;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { auth = true, headers, ...init } = options;
   const token = getAuthToken();
 
-  const response = await fetch(`${API_URL}${path}`, {
+  let response = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -31,6 +63,32 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
       ...headers,
     },
   });
+
+  // Seamlessly auto-refresh token if 401 Unauthorized occurs on protected routes
+  if (
+    response.status === 401 &&
+    auth &&
+    !path.includes("/auth/login") &&
+    !path.includes("/auth/refresh") &&
+    !path.includes("/auth/register")
+  ) {
+    if (!refreshPromise) {
+      refreshPromise = doRefreshToken().finally(() => {
+        refreshPromise = null;
+      });
+    }
+    const newToken = await refreshPromise;
+    if (newToken) {
+      response = await fetch(`${API_URL}${path}`, {
+        ...init,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${newToken}`,
+          ...headers,
+        },
+      });
+    }
+  }
 
   if (response.status === 204) return undefined as T;
 
@@ -69,6 +127,8 @@ export const api = {
       request<any>("/api/auth/login", { ...json("POST", { username_or_email, password }), auth: false }),
     register: (body: Record<string, unknown>) =>
       request<any>("/api/auth/register", { ...json("POST", body), auth: false }),
+    refresh: (refresh_token: string) =>
+      request<any>("/api/auth/refresh", { ...json("POST", { refresh_token }), auth: false }),
     me: () => request<any>("/api/auth/me"),
     permissions: () => request<any>("/api/auth/permissions"),
     update: (body: Record<string, unknown>) => request<any>("/api/auth/me", json("PATCH", body)),
