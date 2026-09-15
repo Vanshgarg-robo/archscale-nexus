@@ -30,8 +30,10 @@ else:
     engine = create_async_engine(
         db_url,
         echo=settings.debug,
-        pool_size=20,
-        max_overflow=10,
+        pool_pre_ping=True,
+        pool_recycle=300,
+        pool_size=10,
+        max_overflow=5,
         connect_args={"statement_cache_size": 0},
     )
 

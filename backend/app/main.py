@@ -5,7 +5,7 @@ from app.config import get_settings
 from app.database import engine, Base
 from app.api import projects, stakeholders, tasks, dependencies, approvals
 from app.api import change_requests, risks, health, notifications
-from app.api import impact, blockers, conversations, ai_chat, graph, dashboard, memory, demo
+from app.api import impact, blockers, conversations, ai_chat, graph, dashboard, memory, demo, documents
 from app.api import auth
 from app.api import admin_users, admin_roles, admin_audit, admin_notifications, admin_dashboard
 from app.api import ai_assistant
@@ -35,6 +35,24 @@ async def lifespan(app: FastAPI):
                 await conn.execute(text("ALTER TABLE users ADD COLUMN mobile_no VARCHAR(30)"))
             except Exception:
                 pass
+
+        # Project progress & client_id migrations
+        project_cols = [
+            ("client_id", "INTEGER"),
+            ("overall_completion_pct", "FLOAT DEFAULT 0.0"),
+            ("design_completion_pct", "FLOAT DEFAULT 0.0"),
+            ("planning_completion_pct", "FLOAT DEFAULT 0.0"),
+            ("execution_completion_pct", "FLOAT DEFAULT 0.0"),
+            ("documentation_completion_pct", "FLOAT DEFAULT 0.0"),
+        ]
+        for col_name, col_type in project_cols:
+            try:
+                await conn.execute(text(f"ALTER TABLE projects ADD COLUMN IF NOT EXISTS {col_name} {col_type}"))
+            except Exception:
+                try:
+                    await conn.execute(text(f"ALTER TABLE projects ADD COLUMN {col_name} {col_type}"))
+                except Exception:
+                    pass
 
     from app.database import async_session
     from app.services.seed_service import seed_demo_data
@@ -84,6 +102,7 @@ app.include_router(conversations.router)
 app.include_router(ai_chat.router)
 app.include_router(graph.router)
 app.include_router(dashboard.router)
+app.include_router(documents.router)
 app.include_router(memory.router)
 app.include_router(demo.router)
 app.include_router(admin_users.router)

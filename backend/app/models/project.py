@@ -19,6 +19,12 @@ class Project(Base):
     target_end_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     location: Mapped[str | None] = mapped_column(String(500))
     budget: Mapped[float | None] = mapped_column(Float)
+    client_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    overall_completion_pct: Mapped[float] = mapped_column(Float, default=0.0)
+    design_completion_pct: Mapped[float] = mapped_column(Float, default=0.0)
+    planning_completion_pct: Mapped[float] = mapped_column(Float, default=0.0)
+    execution_completion_pct: Mapped[float] = mapped_column(Float, default=0.0)
+    documentation_completion_pct: Mapped[float] = mapped_column(Float, default=0.0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
@@ -32,6 +38,7 @@ class Project(Base):
     decisions: Mapped[list["Decision"]] = relationship(back_populates="project")
     notifications: Mapped[list["Notification"]] = relationship(back_populates="project")
     audit_events: Mapped[list["AuditEvent"]] = relationship(back_populates="project")
+    documents: Mapped[list["Document"]] = relationship(lazy="selectin")
 
 
 class ProjectStakeholder(Base):
@@ -58,3 +65,4 @@ from app.models.meeting import Meeting
 from app.models.decision import Decision
 from app.models.notification import Notification
 from app.models.audit_event import AuditEvent
+from app.models.document import Document
