@@ -247,44 +247,6 @@ npm run dev
 
 ---
 
-## 🔐 Environment Variables
-
-### Backend Configuration (`backend/.env`)
-
-```env
-# Database Configuration
-DATABASE_URL=sqlite+aiosqlite:///./archscale.db
-SYNC_DATABASE_URL=sqlite:///./archscale.db
-# For PostgreSQL:
-# DATABASE_URL=postgresql+asyncpg://user:password@host:5432/archscale_nexus
-
-# Authentication & Security
-JWT_SECRET_KEY=your_super_secret_64_character_hex_key_here
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=15
-REFRESH_TOKEN_EXPIRE_DAYS=7
-
-# Google Gemini AI Integration
-GEMINI_API_KEY=your_gemini_api_key_from_google_ai_studio
-GEMINI_MODEL=gemini-2.5-flash
-
-# Application Environment
-ENVIRONMENT=development
-DEBUG=true
-CORS_ORIGINS=["http://localhost:3000","https://archscale-nexus-frontend.onrender.com"]
-```
-
-### Frontend Configuration (`frontend/.env.local`)
-
-```env
-# URL pointing to the FastAPI backend API
-NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
-# For Production on Render:
-# NEXT_PUBLIC_API_URL=https://archscale-nexus.onrender.com
-```
-
----
-
 ## 🧪 Testing & Verification
 
 The project includes an end-to-end integration test suite verifying authentication, RBAC authorization, all 16 module endpoints, and the interactive demo pipeline:
