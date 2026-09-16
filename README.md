@@ -1,156 +1,355 @@
-# ⚡ ArchScale Nexus
+# 🏛️ ArchScale Nexus
 
-> **AI-Powered Coordination Intelligence & Architecture Blast Radius Platform**
+<div align="center">
 
-ArchScale Nexus is an enterprise coordination and architecture intelligence engine designed to eliminate alignment friction across engineering, product, and architectural teams. Powered by **Google Gemini 2.5 Flash**, ArchScale Nexus maps cross-system dependencies, predicts change blast radii, identifies blockers proactively, and preserves institutional architectural decisions.
+![ArchScale Nexus Logo Banner](https://img.shields.io/badge/ArchScale-Nexus-0070F3?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Google Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)
+![Render](https://img.shields.io/badge/Render-Deployed-46E3B7?style=for-the-badge&logo=render&logoColor=black)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
+
+**The AI-Powered Coordination Intelligence Operating System for Architecture, Interior Design, Engineering, and Construction (AEC).**
+
+[🌐 **Live Cloud Deployment**](https://archscale-nexus-frontend.onrender.com/) • [📡 **Interactive API Docs (Swagger)**](https://archscale-nexus.onrender.com/docs) • [💬 **AI Project Manager**](https://archscale-nexus-frontend.onrender.com/chat) • [⚡ **AI Impact Analysis**](https://archscale-nexus-frontend.onrender.com/impact)
+
+</div>
 
 ---
 
-## ✨ Key Features
+## 🧭 What is ArchScale Nexus?
 
-- 🧠 **AI-Powered Impact Analysis**: Automatically analyzes proposed schema and architectural changes, computes blast radii, and flags affected downstream services and teams using Google Gemini.
-- 🕸️ **Interactive Knowledge Graph**: Visual topology powered by `@xyflow/react` showing live services, data pipelines, stakeholders, and upstream/downstream dependencies.
-- 🚦 **Proactive Blocker & Risk Radar**: Real-time detection of cross-team dependencies, critical path bottlenecks, and automated resolution recommendations.
-- 📜 **Institutional Memory Engine**: Centralized repository of Architecture Decision Records (ADRs), post-mortems, and design docs with semantic AI search.
-- 👥 **Stakeholder Alignment & Approvals**: Multi-tier approval workflows with role-based sign-offs, communication logs, and automated notifications.
-- 🎯 **What-If Architecture Simulator**: Test architectural shifts and simulate latency, risk, and team impact before writing a single line of code.
+> **This is NOT a task manager. This is NOT a project tracker.**  
+> ArchScale Nexus is a **Coordination Intelligence Operating System** built specifically for high-stakes Architecture, Interior Design, MEP Engineering, and Construction projects.
+
+In complex built-environment projects, delays and cost overruns rarely happen because people don't have task lists—they happen due to **coordination blindspots**:
+- An architect shifts a kitchen island 1.2 meters, but the electrical engineer isn't notified in time to reroute sub-floor conduit.
+- A vendor's custom Italian Calacatta marble slab gets delayed at customs, silently cascading through waterproofing, screed, and millwork installations.
+- Decisions made in WhatsApp site chats or weekly contractor meetings remain lost in message history until inspections fail.
+
+**ArchScale Nexus acts as an AI Project Manager that automatically determines:**
+1. **Who is responsible** for every deliverable, approval, and decision.
+2. **Who is affected** whenever a change or delay is proposed.
+3. **What depends on what** across multi-disciplinary dependency chains.
+4. **What approvals are required** before downstream work commences.
+5. **What is actively blocked** by missing drawings, overdue sign-offs, or supply delays.
+6. **What risks exist** across schedule, vendor, coordination, and design domains.
+7. **What should happen next** via actionable, prioritized AI guidance.
 
 ---
 
-## 🏗️ Architecture & Tech Stack
+## 🚀 Live Demo & Instant Access
+
+ArchScale Nexus is deployed and live on Render:
+
+| Service | Live URL | Description |
+| :--- | :--- | :--- |
+| 🖥️ **Frontend Web App** | [https://archscale-nexus-frontend.onrender.com/](https://archscale-nexus-frontend.onrender.com/) | Next.js 16 reactive workspace with role-based UI |
+| ⚙️ **Backend REST API** | [https://archscale-nexus.onrender.com](https://archscale-nexus.onrender.com) | FastAPI async microservice with SQLite WAL & Gemini integration |
+| 📖 **API Documentation** | [https://archscale-nexus.onrender.com/docs](https://archscale-nexus.onrender.com/docs) | OpenAPI / Swagger interactive testing console |
+| 🩺 **System Health Check** | [https://archscale-nexus.onrender.com/api/ping](https://archscale-nexus.onrender.com/api/ping) | Live service telemetry and health probe |
+
+### 🔑 Pre-Seeded Demo Accounts (8 Personas)
+
+The platform comes pre-seeded with a comprehensive flagship project:  
+**"The Lumina Pavilion & Penthouse Residence"** *(5,500 sq ft luxury villa, 54 tasks, 26 dependencies, 18 approvals, 12 decisions, 12 risks, 4 change requests, 4 ingested communication records)*.
+
+All demo accounts share the password: **`password123`**
+
+| Role | Name | Email | Tailored Dashboard & Scope |
+| :--- | :--- | :--- | :--- |
+| **Admin** | Alexander Wright | `admin@archscale.io` | **Operations Command**: Tenant telemetry, security audit logs, user provisioning, global system health |
+| **Project Manager** | Arjun Reddy | `arjun@archscale.io` | **Coordination Command**: Full project oversight, blast-radius simulations, blocker resolution, approval workflows |
+| **Lead Architect** | Ananya Sharma | `ananya@archscale.io` | **Design Governance**: Architectural drawings, revision reviews, drawing sign-offs, aesthetic change requests |
+| **Electrical / MEP** | Priya Nair | `priya@elecdesign.com` | **Engineering Workspace**: Sub-floor conduits, Lutron automation, load calculations, MEP clash detection |
+| **General Contractor** | Deepak Singh | `deepak@buildpro.com` | **Site Execution**: Slab screed, drywall staging, on-site contractor scheduling, physical blocker reporting |
+| **Principal Client** | Rajiv Mehra | `rajiv@client.com` | **Executive Client Portal**: Isolated project view, drawing/document sign-offs, budget impact approvals |
+| **Custom Millwork Vendor** | Amit Gupta | `amit@furnishcraft.com` | **Vendor Portal**: Cabinetry deliverables, CAD releases, material lead-time tracking, hold notices |
+| **Site Supervisor** | Mohan Das | `mohan@buildpro.com` | **Field Supervision**: Daily logs, site inspection checklists, material deliveries, real-time blocker pings |
+
+> 💡 **Quick Persona Switching**: Once logged in, use the **Role Switcher** in the header or logout to instantly experience the tailored UI for any of the 8 stakeholders.
+
+---
+
+## ⚡ 16 Core Coordination Intelligence Modules
 
 ```
-archscale-nexus/
-├── backend/          # FastAPI async REST API & Gemini AI Engine
-├── frontend/         # Next.js 16 (App Router), React 19, Tailwind CSS v4
-├── docker-compose.yml# Local development services (PostgreSQL)
-└── .github/          # GitHub Actions CI pipelines
+                        ┌────────────────────────────────────────────────────────┐
+                        │              ARCHSCALE NEXUS INTELLIGENCE              │
+                        └────────────────────────────────────────────────────────┘
+                                                    │
+        ┌───────────────────────────┬───────────────┴───────────────┬───────────────────────────┐
+        ▼                           ▼                               ▼                           ▼
+[ Communication Intel ]     [ Knowledge Graph ]           [ AI Impact Engine ]          [ Project Memory ]
+  • WhatsApp Transcripts      • Dynamic React Flow DAG      • Critical Path Cascades      • Semantic Natural Lang
+  • Email & Voice Notes       • Blockers & Prerequisites    • Cross-Discipline Radius     • Referenced ADRs
+  • Action Item Extraction    • Live Edge Tracing           • Mitigation Strategies       • Instant Retrieval
 ```
 
-### Backend
-- **FastAPI**: High-performance asynchronous Python API framework.
-- **SQLAlchemy 2.0 (Async)**: Modern ORM supporting PostgreSQL (`asyncpg`) and SQLite (`aiosqlite`).
-- **Google GenAI SDK**: Powered by Google's `gemini-2.5-flash` for high-speed structured extraction and reasoning.
-- **Pydantic v2**: Type-safe request and response validation.
-- **JWT Authentication**: Secure Bearer token authentication with role-based access control.
+### 1. 👥 Stakeholder Intelligence & Matrix
+- Multi-dimensional profiling: Authority level, coordination score, influence rating, and active workload index.
+- Dynamically highlights overloaded consultants to prevent review bottlenecks before they impact schedules.
 
-### Frontend
-- **Next.js 16 (App Router)** & **React 19**
-- **TypeScript**: Strict end-to-end type safety.
-- **Tailwind CSS v4**: Ultra-fast, modern reactive interface.
-- **@xyflow/react**: Interactive, customizable DAG and architecture topology graphs.
-- **Recharts**: Metric dashboards and impact visualizations.
-- **Zustand**: Lightweight client-side state management.
+### 2. 💬 Communication Intelligence
+- Ingest unformatted transcripts, emails, WhatsApp logs, and contractor site notes.
+- Automatic AI extraction of deadlines, owners, decisions, pending approvals, risks, and action items into structured database entities.
+
+### 3. ≋ AI Multi-Horizon Summarization
+- Generates high-impact summaries across four horizons: **Executive**, **Daily Operational**, **Weekly Coordination**, and **Cumulative Project Briefings**.
+- Switch between concise 3-bullet overviews and deep forensic breakdowns.
+
+### 4. 🕸️ Project Knowledge Graph (Powered by `@xyflow/react`)
+- Interactive, draggable node-graph visualizing cross-discipline relationships:
+  - `depends_on`, `blocks`, `approved_by`, `assigned_to`, `affected_by`, `requires`.
+- Click any node to open the **Context Slide-Over Drawer** showing prerequisites, downstream blockers, and direct actions.
+
+### 5. ↗️ Change Request Engine
+- Formal governance for design modifications (e.g., *"Shift kitchen island 1.2m"*, *"Calacatta marble heated floor"*).
+- Tracks status through `Proposed` ➔ `Review` ➔ `Approved` ➔ `Rejected` ➔ `Implemented`.
+
+### 6. ☊ Dependency Intelligence & Critical Path Cascades
+- Real-time Directed Acyclic Graph (DAG) traversal computing downstream effects in `<2ms`.
+- Demonstrates how a 2-day delay in drawing sign-off cascades into MEP conduit rework and cabinetry manufacturing delays.
+
+### 7. ⚡ Flagship AI Impact Analysis Engine
+- **The Core Flagship Innovation**: Input any potential architectural or material change to instantly receive:
+  - **Affected Stakeholders**: Exactly who needs to be alerted.
+  - **Affected Tasks & Vendors**: Downstream deliverables placed on hold.
+  - **Estimated Schedule Delay**: Net impact on critical path.
+  - **Overall Risk Score**: Low, Medium, High, or Critical.
+  - **Actionable AI Recommendations**: Immediate steps to mitigate delay.
+  - **1-Click Change Request Generation**: Convert analysis directly into an official proposal.
+
+### 8. ✓ Multi-Tier Approval Intelligence
+- Multi-party approval hierarchies: **Client Sign-off**, **Architectural Review**, **Structural Sign-off**, and **Vendor Clearance**.
+- Enforces strict safety gates—downstream tasks cannot transition to in-progress without required sign-offs.
+
+### 9. ⛔ Automated Blocker Detection Radar
+- Continuously scans for missing approvals, broken dependencies, overdue items, and unassigned critical path tasks.
+- Surfaces active blockers with AI-calculated resolution suggestions.
+
+### 10. 🔔 Coordination Alert System
+- Real-time notifications dispatched when dependency links break, risks escalate, or drawing reviews become overdue.
+- Includes context-grounded AI explanations of *why* the alert matters.
+
+### 11. 🧠 Project Memory (Semantic Natural Language Search)
+- Natural language query interface over the entire project history:
+  - *"Why was the marble specification changed from Carrara to Calacatta?"*
+  - *"Who approved the master bedroom electrical redesign?"*
+  - *"What caused the 4-day delay on the kitchen screed?"*
+- Returns cited, timestamped answers referencing original decisions, meetings, and communications.
+
+### 12. 🤖 AI Project Manager Chat
+- Grounded assistant with real-time access to active project state, dependencies, approvals, and stakeholder workloads.
+- Answers complex queries such as *"What is currently blocking the millwork installation and what should we do next?"*
+
+### 13. ▣ What-If Scenario Simulator
+- Test hypothetical project disruptions before they happen:
+  - *"What if vendor delivery of lighting fixtures is delayed by 14 days?"*
+  - *"What if client approval on layout drawings takes 1 extra week?"*
+- Computes schedule slippage, budget exposure, and recommended mitigation strategies.
+
+### 14. 🛡️ Multi-Dimensional Risk Intelligence
+- Evaluates risk across 5 critical vectors: **Schedule**, **Coordination**, **Dependency**, **Approval**, and **Vendor**.
+- Generates probability × impact matrices and actionable risk mitigation roadmaps.
+
+### 15. 📈 Project Health Scoring Engine
+- Dynamic 0–100 composite health score evaluating task velocity, overdue approvals, critical blockers, and dependency debt.
+- Categorizes status into **Healthy**, **At Risk**, or **Critical**.
+
+### 16. 🎛️ Executive Command Center & Dedicated Role Portals
+- **Role-Tailored Dashboards**:
+  - **Admin Command**: Organization health, security audit logs, platform settings.
+  - **Client Portal**: Project milestone progress, drawing documents, pending sign-offs.
+  - **Management Command**: Sprint status, critical path, blocker resolution, approval queues.
+  - **Vendor Portal**: Active work orders, material specifications, site delivery notices.
+- **Interactive Kitchen Redesign Simulation**: 1-click live walkthrough running an 8-step ripple effect through the entire system.
 
 ---
 
-## 🚀 Quickstart Guide
+## 🛠️ Technology Stack
+
+```
+Frontend Architecture (Next.js 16 + React 19 + Turbopack)
+├── Dynamic Role-Based AppShell
+├── Interactive React Flow Knowledge Graph (@xyflow/react)
+├── Modern Responsive UI with CSS Variables & Glassmorphism
+└── Zustand Session Management & Axios/Fetch API Client
+
+Backend Architecture (FastAPI + Python 3.12 + SQLAlchemy 2.0 Async)
+├── Dual Route Handlers (/api/* & direct /* for legacy compatibility)
+├── Robust RBAC Middleware with 8 Discrete Roles
+├── SQLite WAL (Local) / PostgreSQL + asyncpg (Production)
+├── In-Memory BFS Traversal for Sub-Millisecond Critical Path Resolution
+└── Google Gemini 2.5 Flash GenAI Integration (Structured Outputs)
+```
+
+- **Frontend**: Next.js 16 (App Router), TypeScript, Tailwind CSS v4, `@xyflow/react`, Recharts, Lucide Icons, Zustand.
+- **Backend**: FastAPI, SQLAlchemy 2.0 (Async), Pydantic v2, Google GenAI SDK (`gemini-2.5-flash`), `bcrypt`, `pyjwt`.
+- **Database**: SQLite with WAL mode (`PRAGMA journal_mode=WAL`) for local / Neon PostgreSQL for cloud production.
+- **Deployment**: Render Web Services (Dockerized Backend + Node.js Frontend) with automated health probes.
+
+---
+
+## 💻 Local Development Setup
 
 ### Prerequisites
-- [Python 3.12+](https://www.python.org/downloads/)
-- [Node.js 20+](https://nodejs.org/) and npm
-- (Optional) [Docker](https://www.docker.com/) & Docker Compose
+- **Python 3.12+**
+- **Node.js 20+** and `npm`
+- Git
 
----
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Vansh-Garg-1/archscale-nexus.git
+cd archscale-nexus
+```
 
-### 1. Backend Setup
-
+### 2. Backend Setup
 ```bash
 cd backend
 
-# Create and activate virtual environment
-# On Windows (PowerShell):
+# Create virtual environment
+# Windows:
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+.\.venv\Scripts\activate
 
-# On macOS/Linux:
+# macOS / Linux:
 python3 -m venv .venv
 source .venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Create environment configuration
-copy .env.example .env  # On Linux/macOS: cp .env.example .env
+# Configure environment variables
+copy .env.example .env   # Windows
+# cp .env.example .env   # macOS/Linux
 
-# Run FastAPI server
+# Start FastAPI server
 uvicorn app.main:app --reload --port 8000
 ```
+*Backend API will be live at `http://127.0.0.1:8000` with Swagger docs at `http://127.0.0.1:8000/docs`.*
 
-The backend will be live at `http://localhost:8000`.  
-Explore interactive API docs at `http://localhost:8000/docs`.
-
----
-
-### 2. Frontend Setup
-
+### 3. Frontend Setup
 ```bash
+# In a new terminal:
 cd frontend
 
-# Install dependencies
+# Install packages
 npm install
 
-# Create environment configuration
-copy .env.example .env.local  # On Linux/macOS: cp .env.example .env.local
+# Configure environment variables
+copy .env.example .env.local   # Windows
+# cp .env.example .env.local   # macOS/Linux
 
-# Run Next.js dev server
+# Start Next.js development server
 npm run dev
 ```
-
-Open `http://localhost:3000` in your browser to access the ArchScale Nexus dashboard.
+*Open `http://localhost:3000` in your browser to access ArchScale Nexus.*
 
 ---
 
-### 3. Running with Docker Compose (PostgreSQL)
+## 🔐 Environment Variables
 
-If you prefer to run a local PostgreSQL instance:
+### Backend Configuration (`backend/.env`)
+
+```env
+# Database Configuration
+DATABASE_URL=sqlite+aiosqlite:///./archscale.db
+SYNC_DATABASE_URL=sqlite:///./archscale.db
+# For PostgreSQL:
+# DATABASE_URL=postgresql+asyncpg://user:password@host:5432/archscale_nexus
+
+# Authentication & Security
+JWT_SECRET_KEY=your_super_secret_64_character_hex_key_here
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=15
+REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# Google Gemini AI Integration
+GEMINI_API_KEY=your_gemini_api_key_from_google_ai_studio
+GEMINI_MODEL=gemini-2.5-flash
+
+# Application Environment
+ENVIRONMENT=development
+DEBUG=true
+CORS_ORIGINS=["http://localhost:3000","https://archscale-nexus-frontend.onrender.com"]
+```
+
+### Frontend Configuration (`frontend/.env.local`)
+
+```env
+# URL pointing to the FastAPI backend API
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+# For Production on Render:
+# NEXT_PUBLIC_API_URL=https://archscale-nexus.onrender.com
+```
+
+---
+
+## 🧪 Testing & Verification
+
+The project includes an end-to-end integration test suite verifying authentication, RBAC authorization, all 16 module endpoints, and the interactive demo pipeline:
 
 ```bash
-docker-compose up -d
+cd backend
+python test_all_endpoints.py
 ```
 
-Update your `backend/.env` with:
-```env
-DATABASE_URL=postgresql+asyncpg://archscale:archscale_secret@localhost:5432/archscale_nexus
-SYNC_DATABASE_URL=postgresql://archscale:archscale_secret@localhost:5432/archscale_nexus
+Expected output:
+```
+--- 1. Testing Login ---
+Login Status: 200 (Arjun Reddy - project_manager)
+
+--- 2. Getting Projects ---
+Projects Status: 200 (Active project: The Lumina Pavilion & Penthouse Residence)
+
+--- 3. Testing Demo Pipeline /api/demo/kitchen-redesign ---
+Demo Pipeline Status: 200 (8 steps executed successfully)
+
+--- 4. Testing All Module Endpoints ---
+[PASS] GET /api/dashboard/1 -> 200
+[PASS] GET /api/stakeholders/project/1 -> 200
+[PASS] GET /api/stakeholders/matrix/1 -> 200
+[PASS] GET /api/dependencies/project/1 -> 200
+[PASS] GET /api/dependencies/critical-path/1 -> 200
+[PASS] GET /api/approvals/pending/1 -> 200
+[PASS] GET /api/change-requests/project/1 -> 200
+[PASS] GET /api/risks/project/1 -> 200
+[PASS] GET /api/health/1 -> 200
+[PASS] GET /api/blockers/1 -> 200
+[PASS] GET /api/graph/1 -> 200
+[PASS] POST /api/memory/search -> 200
+[PASS] POST /api/impact/analyze -> 200
+[PASS] POST /api/ai/simulate -> 200
+[PASS] POST /api/ai/chat -> 200
+[PASS] POST /api/ai/summarize -> 200
+
+All endpoints passed: True
 ```
 
 ---
 
-## ⚙️ Environment Variables
+## 🚢 Render Deployment Guide
 
-### Backend (`backend/.env`)
+ArchScale Nexus is configured for turnkey infrastructure on Render using [`render.yaml`](render.yaml):
 
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `DATABASE_URL` | Async database connection URL | `sqlite+aiosqlite:///./archscale.db` |
-| `SYNC_DATABASE_URL` | Sync database connection URL | `sqlite:///./archscale.db` |
-| `JWT_SECRET_KEY` | Secret key for JWT signing | *(Generate secure 64-char key)* |
-| `JWT_ALGORITHM` | JWT signing algorithm | `HS256` |
-| `ACCESS_TOKEN_EXPIRE_MINUTES`| Access token TTL | `15` |
-| `REFRESH_TOKEN_EXPIRE_DAYS` | Refresh token TTL | `7` |
-| `GEMINI_API_KEY` | Google AI Studio API Key | *(Get from Google AI Studio)* |
-| `GEMINI_MODEL` | Gemini AI model identifier | `gemini-2.5-flash` |
-| `ENVIRONMENT` | Runtime environment (`development` / `production`) | `development` |
-| `DEBUG` | Verbose debug mode | `true` |
-| `CORS_ORIGINS` | JSON list of allowed origins | `["http://localhost:3000"]` |
-
-### Frontend (`frontend/.env.local`)
-
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `NEXT_PUBLIC_API_URL` | URL of the ArchScale Nexus backend | `http://localhost:8000` |
+1. Fork or push this repository to GitHub.
+2. Link your repository in the [Render Dashboard](https://dashboard.render.com).
+3. Render automatically provisions:
+   - **`archscale-nexus`**: Docker Web Service running the FastAPI backend with healthcheck at `/api/ping`.
+   - **`archscale-nexus-frontend`**: Node Web Service building and serving the Next.js 16 frontend.
+4. Set your `GEMINI_API_KEY` and `JWT_SECRET_KEY` in the Render environment settings.
+5. Your application is live at `https://archscale-nexus-frontend.onrender.com/`.
 
 ---
 
-## 🔒 Security Best Practices
+## 📜 License
 
-- **Never commit `.env` files**: All secrets, private keys, and database credentials are excluded in `.gitignore`.
-- Always generate a strong, unique `JWT_SECRET_KEY` before deploying to production.
-- Use PostgreSQL with SSL enabled (`sslmode=require`) in production environments.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
+<div align="center">
+Built with precision for architects, engineers, and builders who coordinate the real world.
+<br />
+<strong>ArchScale Nexus © 2026</strong>
+</div>
