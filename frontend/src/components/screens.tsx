@@ -30,6 +30,13 @@ import {
   SummariesPage,
   UserPage,
 } from "@/components/workspace-pages";
+import {
+  AdminOperationsDashboard,
+  ClientDashboard,
+  ManagementDashboard,
+  VendorDashboard,
+  DocumentsPage,
+} from "@/components/role-dashboards";
 
 export function LoginScreen() {
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -231,8 +238,23 @@ export function WorkspaceScreen({
   projectId: number;
   user: any;
 }) {
+  const renderDashboard = () => {
+    const role = user?.role || "viewer";
+    if (role === "admin" || user?.is_superadmin) {
+      return <AdminOperationsDashboard user={user} />;
+    }
+    if (role === "client") {
+      return <ClientDashboard projectId={projectId} user={user} />;
+    }
+    if (role === "vendor" || role === "contractor") {
+      return <VendorDashboard user={user} />;
+    }
+    return <ManagementDashboard user={user} />;
+  };
+
   const paths: Record<string, React.ReactNode> = {
-    "/": <Dashboard projectId={projectId} user={user} />,
+    "/": renderDashboard(),
+    "/documents": <DocumentsPage projectId={projectId} user={user} />,
     "/impact": <ImpactPage projectId={projectId} />,
     "/chat": <ChatPage projectId={projectId} />,
     "/stakeholders": <StakeholdersPage projectId={projectId} />,

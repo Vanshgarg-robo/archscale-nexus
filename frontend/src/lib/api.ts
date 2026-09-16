@@ -140,7 +140,19 @@ export const api = {
     get: (id: number) => request<any>(`/api/projects/${id}`),
     create: (body: Record<string, unknown>) => request<any>("/api/projects", json("POST", body)),
   },
-  dashboard: (id: number) => request<any>(`/api/dashboard/${id}`),
+  dashboard: Object.assign(
+    (id: number) => request<any>(`/api/dashboard/${id}`),
+    {
+      client: (id: number) => request<any>(`/api/dashboard/${id}`),
+      operations: () => request<any>("/api/dashboard/operations"),
+      management: () => request<any>("/api/dashboard/management"),
+      vendor: () => request<any>("/api/dashboard/vendor"),
+    }
+  ),
+  documents: {
+    list: (projectId: number) => request<any[]>(`/api/documents/project/${projectId}`),
+    create: (body: Record<string, unknown>) => request<any>("/api/documents", json("POST", body)),
+  },
   stakeholders: {
     list: (id: number) => request<any[]>(`/api/stakeholders/project/${id}`),
     matrix: (id: number) => request<any[]>(`/api/stakeholders/matrix/${id}`),
