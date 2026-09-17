@@ -48,42 +48,11 @@ async def list_project_documents(
     db: AsyncSession = Depends(get_session),
 ):
     """List documents and drawings for a project.
-    Security rule: Only the owning client and assigned team members can access complete confidential drawings and documents.
+    Security rule: Only the owning client and authorized project contributors can access complete confidential drawings and documents.
     Admins do not access confidential client documents by default.
     """
-    # Verify project exists
-    res = await db.execute(select(Project).where(Project.id == project_id))
-    project = res.scalar_one_or_none()
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
-
-    # Enforce role checks
-    if current_user.role == "client":
-        # Check ownership or assignment
-        is_owner = (project.client_id == current_user.id)
-        if not is_owner and current_user.stakeholder_id:
-            stk_res = await db.execute(
-                select(ProjectStakeholder).where(
-                    ProjectStakeholder.project_id == project_id,
-                    ProjectStakeholder.stakeholder_id == current_user.stakeholder_id,
-                )
-            )
-            is_owner = stk_res.scalar_one_or_none() is not None
-
-        if not is_owner:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied: You are not authorized to view documents for this project",
-            )
-    elif current_user.role == "admin":
-        # Per business rule: Admin should not view client confidential documents by default
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access restricted: Client confidential documents are reserved for the project client",
-        )
-    elif current_user.role in ("vendor", "contractor"):
-        # Vendors only see deliverables / specifications relevant to their work
-        pass
+    from app.deps import verify_project_access
+    await verify_project_access(project_id, current_user, db, allow_admin_coordination=False)
 
     doc_res = await db.execute(
         select(Document).where(Document.project_id == project_id).order_by(Document.created_at.desc())
@@ -112,8 +81,9 @@ async def create_document(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_session),
 ):
-    if current_user.role == "viewer":
-        raise HTTPException(status_code=403, detail="Viewer role is read-only")
+    from app.deps import verify_project_access, require_not_viewer
+    require_not_viewer(current_user)
+    await verify_project_access(data.project_id, current_user, db, allow_admin_coordination=False)
 
     doc = Document(
         project_id=data.project_id,
@@ -126,7 +96,8 @@ async def create_document(
         created_at=datetime.now(timezone.utc),
     )
     db.add(doc)
-    await db.flush()
+    await db.commit()
+    await db.refresh(doc)
     return DocumentRead(
         id=doc.id,
         project_id=doc.project_id,

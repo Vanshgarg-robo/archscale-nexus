@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.deps import get_session
-from app.models import Conversation
+from sqlalchemy import select
+from app.deps import get_session, get_current_user, verify_project_access, require_not_viewer
+from app.models import Conversation, User
 from app.schemas.ai import ConversationUpload
 from app.services.ai_service import extract_from_conversation
 
@@ -9,7 +10,14 @@ router = APIRouter(prefix="/api/conversations", tags=["conversations"])
 
 
 @router.post("/upload")
-async def upload_conversation(data: ConversationUpload, db: AsyncSession = Depends(get_session)):
+async def upload_conversation(
+    data: ConversationUpload,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    require_not_viewer(current_user)
+    await verify_project_access(data.project_id, current_user, db)
+
     extracted = await extract_from_conversation(data.content, data.source_type)
 
     conversation = Conversation(
@@ -26,7 +34,7 @@ async def upload_conversation(data: ConversationUpload, db: AsyncSession = Depen
         summary=extracted.get("summary", ""),
     )
     db.add(conversation)
-    await db.flush()
+    await db.commit()
 
     return {
         "id": conversation.id,
@@ -35,8 +43,12 @@ async def upload_conversation(data: ConversationUpload, db: AsyncSession = Depen
 
 
 @router.get("/{project_id}")
-async def list_conversations(project_id: int, db: AsyncSession = Depends(get_session)):
-    from sqlalchemy import select
+async def list_conversations(
+    project_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    await verify_project_access(project_id, current_user, db)
     result = await db.execute(
         select(Conversation)
         .where(Conversation.project_id == project_id)

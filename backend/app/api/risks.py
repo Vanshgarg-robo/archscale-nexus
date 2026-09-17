@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.deps import get_session
-from app.models import Risk
+from app.deps import get_session, get_current_user, verify_project_access
+from app.models import Risk, User
 from app.schemas.risk import RiskRead
 from app.services.risk_service import get_risk_summary
 
@@ -10,7 +10,12 @@ router = APIRouter(prefix="/api/risks", tags=["risks"])
 
 
 @router.get("/project/{project_id}")
-async def list_risks(project_id: int, db: AsyncSession = Depends(get_session)):
+async def list_risks(
+    project_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    await verify_project_access(project_id, current_user, db)
     result = await db.execute(select(Risk).where(Risk.project_id == project_id, Risk.is_active == True))
     risks = result.scalars().all()
     return [
@@ -31,5 +36,10 @@ async def list_risks(project_id: int, db: AsyncSession = Depends(get_session)):
 
 
 @router.get("/summary/{project_id}")
-async def risk_summary(project_id: int, db: AsyncSession = Depends(get_session)):
+async def risk_summary(
+    project_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    await verify_project_access(project_id, current_user, db)
     return await get_risk_summary(db, project_id)

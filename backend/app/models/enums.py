@@ -15,6 +15,11 @@ class StakeholderRole(str, enum.Enum):
 
 
 class TaskStatus(str, enum.Enum):
+    DRAFT = "draft"
+    SUBMITTED = "submitted"
+    PENDING_APPROVAL = "pending_approval"
+    APPROVED = "approved"
+    REJECTED = "rejected"
     NOT_STARTED = "not_started"
     IN_PROGRESS = "in_progress"
     ON_HOLD = "on_hold"

@@ -56,14 +56,19 @@ async def get_approval_history(db: AsyncSession, project_id: int) -> list[dict]:
 
     history = []
     for a in approvals:
+        approver_display = a.decided_by_name or (a.approver.name if a.approver else "Authorized Lead")
         history.append({
             "id": a.id,
             "title": a.title,
             "status": a.status.value,
             "approval_type": a.approval_type,
-            "approver_name": a.approver.name if a.approver else "Unknown",
+            "approver_name": approver_display,
+            "decided_by_name": approver_display,
             "decided_at": a.decided_at.isoformat() if a.decided_at else None,
             "notes": a.notes,
+            "rejection_reason": getattr(a, "rejection_reason", None),
+            "related_task_id": a.related_task_id,
+            "related_task_title": a.related_task.title if a.related_task else None,
         })
 
     return sorted(history, key=lambda x: x.get("decided_at") or "", reverse=True)

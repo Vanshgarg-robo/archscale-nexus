@@ -132,6 +132,22 @@ async def get_admin_operations_dashboard(
     )
     completed_tasks = completed_tasks_res.scalar() or 0
 
+    # 3b. Approved / Rejected / Pending Approval counts
+    approved_tasks_res = await db.execute(
+        select(func.count(Task.id)).where(Task.status.in_([TaskStatus.APPROVED, TaskStatus.COMPLETED]))
+    )
+    approved_tasks = approved_tasks_res.scalar() or 0
+
+    rejected_tasks_res = await db.execute(
+        select(func.count(Task.id)).where(Task.status == TaskStatus.REJECTED)
+    )
+    rejected_tasks = rejected_tasks_res.scalar() or 0
+
+    pending_approval_tasks_res = await db.execute(
+        select(func.count(Task.id)).where(Task.status.in_([TaskStatus.PENDING_APPROVAL, TaskStatus.SUBMITTED]))
+    )
+    pending_approval_tasks = pending_approval_tasks_res.scalar() or 0
+
     # 4. Clients status
     client_stks = [s for s in stakeholders if s.role == StakeholderRole.CLIENT]
     clients_status = []
@@ -174,7 +190,10 @@ async def get_admin_operations_dashboard(
             "total": total_tasks,
             "pending": pending_tasks,
             "completed": completed_tasks,
-            "completion_rate": round((completed_tasks / total_tasks * 100) if total_tasks > 0 else 0, 1),
+            "approved": approved_tasks,
+            "rejected": rejected_tasks,
+            "pending_approvals": pending_approval_tasks,
+            "completion_rate": round((approved_tasks / total_tasks * 100) if total_tasks > 0 else 0, 1),
         },
         "projects_summary": projects_summary,
         "team_performance": team_performance,
@@ -198,13 +217,20 @@ async def get_management_dashboard(
     Shows assigned tasks, active work items, progress updates, due dates, completion percentages.
     Enforces read-only posture for Viewers.
     """
+    allowed_roles = {"admin", "project_manager", "architect", "engineer", "site_supervisor", "analyst", "operator", "viewer"}
+    if current_user.role not in allowed_roles and not current_user.is_superadmin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Access denied: Role '{current_user.role}' is not authorized to access the Management Dashboard",
+        )
+
     stk_id = current_user.stakeholder_id
 
-    # 1. Fetch tasks assigned to current stakeholder (or all project tasks if supervisor/PM)
+    # 1. Fetch tasks assigned to current stakeholder
     if stk_id:
         task_query = select(Task).where(Task.assignee_id == stk_id)
     else:
-        task_query = select(Task).limit(10)
+        task_query = select(Task).where(Task.id == -1)
 
     task_res = await db.execute(task_query.order_by(Task.due_date.asc()))
     assigned_tasks = task_res.scalars().all()
@@ -225,7 +251,16 @@ async def get_management_dashboard(
     ]
 
     # 3. Project progress summaries for assigned projects
-    proj_res = await db.execute(select(Project).order_by(Project.id))
+    if stk_id:
+        proj_res = await db.execute(
+            select(Project)
+            .join(ProjectStakeholder, ProjectStakeholder.project_id == Project.id)
+            .where(ProjectStakeholder.stakeholder_id == stk_id)
+            .distinct()
+            .order_by(Project.id)
+        )
+    else:
+        proj_res = await db.execute(select(Project).order_by(Project.id))
     projects = proj_res.scalars().all()
     projects_progress = [
         {
@@ -236,13 +271,27 @@ async def get_management_dashboard(
         for p in projects
     ]
 
-    # 4. Recent project updates / decisions
-    dec_res = await db.execute(select(Decision).order_by(Decision.decided_at.desc()).limit(5))
-    recent_decisions = dec_res.scalars().all()
+    # 4. Recent project updates / decisions within assigned projects
+    project_ids = [p.id for p in projects]
+    if project_ids:
+        dec_res = await db.execute(
+            select(Decision)
+            .where(Decision.project_id.in_(project_ids))
+            .order_by(Decision.decided_at.desc())
+            .limit(5)
+        )
+        recent_decisions = dec_res.scalars().all()
 
-    # 5. Pending approvals if authority
-    appr_res = await db.execute(select(Approval).where(Approval.status == "pending").limit(5))
-    pending_approvals = appr_res.scalars().all()
+        # 5. Pending approvals within assigned projects
+        appr_res = await db.execute(
+            select(Approval)
+            .where(Approval.project_id.in_(project_ids), Approval.status == "pending")
+            .limit(5)
+        )
+        pending_approvals = appr_res.scalars().all()
+    else:
+        recent_decisions = []
+        pending_approvals = []
 
     return {
         "view": "management",
@@ -258,6 +307,9 @@ async def get_management_dashboard(
             "completed": sum(1 for t in assigned_tasks if t.status == TaskStatus.COMPLETED),
             "in_progress": sum(1 for t in assigned_tasks if t.status == TaskStatus.IN_PROGRESS),
             "pending": sum(1 for t in assigned_tasks if t.status == TaskStatus.NOT_STARTED),
+            "approved": sum(1 for t in assigned_tasks if t.status in (TaskStatus.APPROVED, TaskStatus.COMPLETED)),
+            "rejected": sum(1 for t in assigned_tasks if t.status == TaskStatus.REJECTED),
+            "pending_approval": sum(1 for t in assigned_tasks if t.status in (TaskStatus.PENDING_APPROVAL, TaskStatus.SUBMITTED)),
         },
         "projects_progress": projects_progress,
         "recent_decisions": [
@@ -287,6 +339,13 @@ async def get_vendor_dashboard(
     Shows assigned deliverables, submission status, and work progress.
     Strictly prevents access to unrelated projects or client confidential details.
     """
+    allowed_roles = {"vendor", "contractor", "site_supervisor"}
+    if current_user.role not in allowed_roles and not current_user.is_superadmin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Access denied: Role '{current_user.role}' is not authorized to access the Vendor Dashboard",
+        )
+
     stk_id = current_user.stakeholder_id
 
     # Fetch deliverables (tasks assigned to vendor stakeholder)
@@ -386,10 +445,6 @@ async def get_client_executive_dashboard(
             )
         )
         is_authorized = stk_res.scalar_one_or_none() is not None
-
-    # Also grant access if user is rajiv@client.com or registered demo client
-    if not is_authorized and current_user.role == "client":
-        is_authorized = True
 
     if not is_authorized:
         raise HTTPException(

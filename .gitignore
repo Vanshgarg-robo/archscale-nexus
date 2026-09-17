@@ -30,10 +30,13 @@ build/
 
 # --- Databases & SQLite files ---
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
 archscale.db
 backend/archscale.db
+*.tsbuildinfo
 
 # --- Node.js & Frontend ---
 node_modules/

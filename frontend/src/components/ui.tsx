@@ -181,13 +181,13 @@ export function Empty({
 }
 
 export function Modal({
-  isOpen,
+  isOpen = true,
   onClose,
   title,
   children,
   maxWidth = 520,
 }: {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
@@ -241,5 +241,25 @@ export function formatDateTime(value?: string | null) {
 }
 
 export function severityClass(value?: string) {
-  return value?.toLowerCase().replaceAll(" ", "_") || "";
+  return value?.toLowerCase().replaceAll(" ", "") || "";
+}
+
+// ─── Workflow Event Bus ───────────────────────────────────────────────────────
+// Allows any component to broadcast an "approval workflow changed" signal,
+// and any listening component to auto-refresh its data.
+
+const WORKFLOW_EVENT = "archscale:workflow-update";
+
+export function emitWorkflowUpdate() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(WORKFLOW_EVENT));
+  }
+}
+
+export function useWorkflowListener(callback: () => void) {
+  useEffect(() => {
+    const handler = () => callback();
+    window.addEventListener(WORKFLOW_EVENT, handler);
+    return () => window.removeEventListener(WORKFLOW_EVENT, handler);
+  }, [callback]); // eslint-disable-line react-hooks/exhaustive-deps
 }

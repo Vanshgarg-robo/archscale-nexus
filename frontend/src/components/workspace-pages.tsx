@@ -218,12 +218,45 @@ export function ApprovalsPage({ projectId }: { projectId: number }) {
   const pending = useRequest(() => api.approvals.pending(projectId), [projectId]);
   const history = useRequest(() => api.approvals.history(projectId), [projectId]);
   const [working, setWorking] = useState<number | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<{ id: number; title: string } | null>(null);
+  const [rejectReason, setRejectReason] = useState("Needs revision");
+  const [rejectComments, setRejectComments] = useState("");
 
-  const decide = async (id: number, status: string) => {
+  const refreshAll = async () => {
+    await Promise.all([pending.refresh(), history.refresh()]);
+    // Emit global event so dashboards auto-refresh
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("archscale:workflow-update"));
+    }
+  };
+
+  const handleApprove = async (id: number) => {
     setWorking(id);
     try {
-      await api.approvals.update(id, { status });
-      await Promise.all([pending.refresh(), history.refresh()]);
+      await api.approvals.decide(id, { status: "approved" });
+      await refreshAll();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to approve");
+    } finally {
+      setWorking(null);
+    }
+  };
+
+  const handleRejectSubmit = async () => {
+    if (!rejectTarget) return;
+    setWorking(rejectTarget.id);
+    try {
+      await api.approvals.decide(rejectTarget.id, {
+        status: "rejected",
+        reason: rejectReason,
+        notes: rejectComments || undefined,
+      });
+      setRejectTarget(null);
+      setRejectReason("Needs revision");
+      setRejectComments("");
+      await refreshAll();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to reject");
     } finally {
       setWorking(null);
     }
@@ -243,6 +276,8 @@ export function ApprovalsPage({ projectId }: { projectId: number }) {
   }
 
   const overdue = pending.data?.filter((item: any) => item.is_overdue).length || 0;
+  const approvedCount = history.data?.filter((item: any) => item.status === "approved").length || 0;
+  const rejectedCount = history.data?.filter((item: any) => item.status === "rejected").length || 0;
 
   return (
     <>
@@ -254,8 +289,8 @@ export function ApprovalsPage({ projectId }: { projectId: number }) {
       <div className="grid cards">
         <Metric label="Pending approvals" value={pending.data?.length || 0} icon="⏳" />
         <Metric label="Overdue decisions" value={overdue} hint="escalation required" icon="🚨" />
-        <Metric label="Approved / Rejected" value={history.data?.length || 0} icon="✓" />
-        <Metric label="Governance status" value={overdue ? "At Risk" : "Clear"} icon="🛡️" />
+        <Metric label="Approved" value={approvedCount} icon="✅" />
+        <Metric label="Rejected" value={rejectedCount} icon="❌" />
       </div>
 
       <div className="grid two" style={{ marginTop: 16 }}>
@@ -283,14 +318,14 @@ export function ApprovalsPage({ projectId }: { projectId: number }) {
                   <button
                     className="button small primary"
                     disabled={working === approval.id}
-                    onClick={() => void decide(approval.id, "approved")}
+                    onClick={() => void handleApprove(approval.id)}
                   >
                     {working === approval.id ? "…" : "Approve"}
                   </button>
                   <button
                     className="button small danger"
                     disabled={working === approval.id}
-                    onClick={() => void decide(approval.id, "rejected")}
+                    onClick={() => setRejectTarget({ id: approval.id, title: approval.title })}
                   >
                     {working === approval.id ? "…" : "Reject"}
                   </button>
@@ -313,8 +348,18 @@ export function ApprovalsPage({ projectId }: { projectId: number }) {
                   <strong>{approval.title}</strong>
                   <br />
                   <small className="muted">
-                    Decided by {approval.approver_name} on {formatDate(approval.decided_at)}
+                    Decided by {approval.decided_by_name || approval.approver_name} on {formatDate(approval.decided_at)}
                   </small>
+                  {approval.rejection_reason && (
+                    <div style={{ marginTop: 4, fontSize: 12 }}>
+                      <Badge label={approval.rejection_reason} variant="danger" />
+                    </div>
+                  )}
+                  {approval.notes && (
+                    <div style={{ marginTop: 2, fontSize: 12, color: "var(--muted)", fontStyle: "italic" }}>
+                      {approval.notes}
+                    </div>
+                  )}
                 </div>
                 <Status value={approval.status} />
               </div>
@@ -327,6 +372,51 @@ export function ApprovalsPage({ projectId }: { projectId: number }) {
           </div>
         </Card>
       </div>
+
+      {/* Rejection Reason Modal */}
+      {rejectTarget && (
+        <Modal title={`Reject: ${rejectTarget.title}`} onClose={() => setRejectTarget(null)}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 340 }}>
+            <label style={{ fontSize: 13, fontWeight: 600 }}>Reason for Rejection</label>
+            <select
+              className="input"
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              style={{ padding: "8px 12px" }}
+            >
+              <option value="Missing information">Missing information</option>
+              <option value="Needs revision">Needs revision</option>
+              <option value="Incorrect submission">Incorrect submission</option>
+              <option value="Budget issue">Budget issue</option>
+              <option value="Timeline issue">Timeline issue</option>
+              <option value="Quality concerns">Quality concerns</option>
+              <option value="Scope mismatch">Scope mismatch</option>
+              <option value="Other">Other</option>
+            </select>
+            <label style={{ fontSize: 13, fontWeight: 600 }}>Additional Comments (optional)</label>
+            <textarea
+              className="input"
+              value={rejectComments}
+              onChange={(e) => setRejectComments(e.target.value)}
+              placeholder="Provide additional context for the rejection…"
+              rows={3}
+              style={{ padding: "8px 12px", resize: "vertical" }}
+            />
+            <div className="row" style={{ gap: 8, justifyContent: "flex-end" }}>
+              <button className="button ghost" onClick={() => setRejectTarget(null)}>
+                Cancel
+              </button>
+              <button
+                className="button danger"
+                disabled={working === rejectTarget.id}
+                onClick={() => void handleRejectSubmit()}
+              >
+                {working === rejectTarget.id ? "Rejecting…" : "Confirm Rejection"}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </>
   );
 }

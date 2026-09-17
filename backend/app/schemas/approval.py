@@ -29,13 +29,24 @@ class ApprovalRead(BaseModel):
     due_date: datetime | None
     decided_at: datetime | None
     notes: str | None
+    rejection_reason: str | None = None
+    decided_by_id: int | None = None
+    decided_by_name: str | None = None
     created_at: datetime | None
     requester_name: str | None = None
     approver_name: str | None = None
+    related_task_title: str | None = None
 
     model_config = {"from_attributes": True}
 
 
 class ApprovalUpdate(BaseModel):
     status: ApprovalStatus | None = None
+    notes: str | None = None
+    rejection_reason: str | None = None
+
+
+class ApprovalDecisionRequest(BaseModel):
+    status: str  # "approved" or "rejected"
+    reason: str | None = None
     notes: str | None = None

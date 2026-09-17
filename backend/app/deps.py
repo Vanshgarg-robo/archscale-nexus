@@ -90,10 +90,93 @@ def require_permission(permission: str):
 def require_role(*roles: str):
     """Dependency factory that checks if the current user has one of the specified roles."""
     async def _check(user: User = Depends(get_current_user)):
-        if user.role not in roles:
+        if user.role not in roles and not user.is_superadmin:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Role {user.role} not authorized. Required: {', '.join(roles)}",
             )
         return user
     return _check
+
+
+def require_not_viewer(user: User):
+    """Enforce that Viewer role has strictly read-only access."""
+    if user.role == "viewer":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: Viewer accounts have read-only access",
+        )
+    return user
+
+
+async def verify_project_access(
+    project_id: int,
+    user: User,
+    db: AsyncSession,
+    allow_admin_coordination: bool = True,
+):
+    """Verifies that the user has legitimate access to the given project.
+    Enforces tenant and partner boundaries across all roles."""
+    from sqlalchemy import select
+    from app.models.project import Project, ProjectStakeholder
+
+    proj_res = await db.execute(select(Project).where(Project.id == project_id))
+    project = proj_res.scalar_one_or_none()
+    if not project:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+
+    if not allow_admin_coordination and (user.role == "admin" or user.is_superadmin):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access restricted: Client confidential resources are isolated from administrative oversight",
+        )
+
+    if user.is_superadmin:
+        return project
+
+    role = user.role
+
+    if role == "admin":
+        if allow_admin_coordination:
+            return project
+
+    if role == "client":
+        if project.client_id == user.id:
+            return project
+        if user.stakeholder_id:
+            stk_res = await db.execute(
+                select(ProjectStakeholder).where(
+                    ProjectStakeholder.project_id == project_id,
+                    ProjectStakeholder.stakeholder_id == user.stakeholder_id,
+                )
+            )
+            if stk_res.scalar_one_or_none():
+                return project
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not own or participate in this project",
+        )
+
+    # Any user with an assigned stakeholder profile must be assigned to this project
+    if user.stakeholder_id:
+        stk_res = await db.execute(
+            select(ProjectStakeholder).where(
+                ProjectStakeholder.project_id == project_id,
+                ProjectStakeholder.stakeholder_id == user.stakeholder_id,
+            )
+        )
+        if stk_res.scalar_one_or_none():
+            return project
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You are not assigned to this project",
+        )
+
+    # General internal platform roles without individual project stakeholder assignments
+    if role in ("admin", "analyst", "operator", "viewer"):
+        return project
+
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Access denied: You are not assigned to this project",
+    )

@@ -160,8 +160,13 @@ export const api = {
   },
   tasks: {
     list: (id: number) => request<any[]>(`/api/tasks/project/${id}`),
+    get: (id: number) => request<any>(`/api/tasks/${id}`),
     create: (body: Record<string, unknown>) => request<any>("/api/tasks", json("POST", body)),
     update: (id: number, body: Record<string, unknown>) => request<any>(`/api/tasks/${id}`, json("PATCH", body)),
+    submit: (id: number) => request<any>(`/api/tasks/${id}/submit`, json("POST")),
+    approve: (id: number, body?: Record<string, unknown>) => request<any>(`/api/tasks/${id}/approve`, json("POST", body || {})),
+    reject: (id: number, body: { reason: string; comments?: string; notes?: string }) =>
+      request<any>(`/api/tasks/${id}/reject`, json("POST", body)),
   },
   dependencies: {
     list: (id: number) => request<any[]>(`/api/dependencies/project/${id}`),
@@ -171,6 +176,8 @@ export const api = {
     pending: (id: number) => request<any[]>(`/api/approvals/pending/${id}`),
     history: (id: number) => request<any[]>(`/api/approvals/history/${id}`),
     update: (id: number, body: Record<string, unknown>) => request<any>(`/api/approvals/${id}`, json("PATCH", body)),
+    decide: (id: number, body: { status: string; reason?: string; notes?: string }) =>
+      request<any>(`/api/approvals/${id}/decide`, json("POST", body)),
   },
   changes: {
     list: (id: number) => request<any[]>(`/api/change-requests/project/${id}`),

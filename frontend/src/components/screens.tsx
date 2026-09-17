@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { api } from "@/lib/api";
 import {
   Card,
@@ -37,6 +38,7 @@ import {
   VendorDashboard,
   DocumentsPage,
 } from "@/components/role-dashboards";
+import { TasksPage } from "@/components/tasks-page";
 
 export function LoginScreen() {
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -260,6 +262,7 @@ export function WorkspaceScreen({
     "/stakeholders": <StakeholdersPage projectId={projectId} />,
     "/dependencies": <DependenciesPage projectId={projectId} />,
     "/approvals": <ApprovalsPage projectId={projectId} />,
+    "/tasks": <TasksPage projectId={projectId} user={user} />,
     "/blockers": <BlockersPage projectId={projectId} />,
     "/risks": <RisksPage projectId={projectId} />,
     "/change-requests": <ChangeRequestsPage projectId={projectId} user={user} />,
@@ -274,6 +277,52 @@ export function WorkspaceScreen({
 
   if (route.startsWith("/admin")) {
     return <AdminPage route={route} user={user} />;
+  }
+
+  const role = user?.role || "viewer";
+  const isSuper = user?.is_superadmin || role === "admin";
+
+  const isRoutePermitted = (targetRoute: string): boolean => {
+    if (isSuper) return true;
+    if (targetRoute === "/" || targetRoute === "/user" || targetRoute === "/chat") return true;
+
+    if (role === "client") {
+      return ["/documents", "/communications", "/approvals", "/change-requests", "/summaries"].includes(targetRoute);
+    }
+    if (role === "vendor" || role === "contractor") {
+      return ["/tasks", "/communications"].includes(targetRoute);
+    }
+    // Management team members cannot access platform administration
+    return !targetRoute.startsWith("/admin");
+  };
+
+  if (!isRoutePermitted(route)) {
+    return (
+      <>
+        <PageHeader
+          title="Access Restricted"
+          description="Your current role permissions do not allow viewing this workspace module."
+        />
+        <Card>
+          <div className="notice error" style={{ marginBottom: 16 }}>
+            <div className="row" style={{ gap: 10 }}>
+              <span style={{ fontSize: 22 }}>🛑</span>
+              <div>
+                <strong>403 Forbidden: Module Access Denied</strong>
+                <p style={{ margin: "4px 0 0", fontSize: 13 }}>
+                  Your assigned role (<strong>{role}</strong>) does not have authorization to view <code>{route}</code>.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="row" style={{ gap: 12 }}>
+            <Link className="button primary" href="/">
+              Return to Authorized Dashboard
+            </Link>
+          </div>
+        </Card>
+      </>
+    );
   }
 
   return (

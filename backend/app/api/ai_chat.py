@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import json
-from app.deps import get_session
-from app.models import Task, Dependency, Stakeholder, Approval, ChangeRequest, Risk, Decision, ProjectStakeholder
+from app.deps import get_session, get_current_user, verify_project_access
+from app.models import Task, Dependency, Stakeholder, Approval, ChangeRequest, Risk, Decision, ProjectStakeholder, User
 from app.schemas.ai import ChatRequest, SummaryRequest, SimulationRequest
 from app.services.ai_service import chat_with_project, generate_summary, simulate_scenario
 
@@ -70,7 +70,12 @@ async def _build_project_context(db: AsyncSession, project_id: int) -> str:
 
 
 @router.post("/chat")
-async def chat(data: ChatRequest, db: AsyncSession = Depends(get_session)):
+async def chat(
+    data: ChatRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    await verify_project_access(data.project_id, current_user, db)
     context = await _build_project_context(db, data.project_id)
     history = [{"role": h.role, "content": h.content} for h in data.history]
     response = await chat_with_project(context, data.message, history)
@@ -78,14 +83,24 @@ async def chat(data: ChatRequest, db: AsyncSession = Depends(get_session)):
 
 
 @router.post("/summarize")
-async def summarize(data: SummaryRequest, db: AsyncSession = Depends(get_session)):
+async def summarize(
+    data: SummaryRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    await verify_project_access(data.project_id, current_user, db)
     context = await _build_project_context(db, data.project_id)
     result = await generate_summary(context, data.summary_type)
     return result
 
 
 @router.post("/simulate")
-async def simulate(data: SimulationRequest, db: AsyncSession = Depends(get_session)):
+async def simulate(
+    data: SimulationRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    await verify_project_access(data.project_id, current_user, db)
     context = await _build_project_context(db, data.project_id)
     result = await simulate_scenario(context, data.scenario)
     return result

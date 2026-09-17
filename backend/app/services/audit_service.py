@@ -92,3 +92,73 @@ async def get_recent_audit_logs(db: AsyncSession, limit: int = 10) -> list[Admin
 async def get_audit_log_count(db: AsyncSession) -> int:
     result = await db.execute(select(func.count(AdminAuditLog.id)))
     return result.scalar() or 0
+
+
+async def log_approval_activity(
+    db: AsyncSession,
+    user: any,
+    action: str,  # "APPROVED", "REJECTED", "SUBMITTED"
+    task_id: int | None,
+    task_title: str,
+    previous_status: str,
+    new_status: str,
+    project_id: int,
+    reason: str | None = None,
+    comments: str | None = None,
+) -> AdminAuditLog:
+    actor_name = getattr(user, "full_name", None) or getattr(user, "username", None) or getattr(user, "email", "User")
+    role = getattr(user, "role", "unknown")
+    user_id = getattr(user, "id", 1)
+    stakeholder_id = getattr(user, "stakeholder_id", None)
+
+    if action.upper() == "APPROVED":
+        readable_action = f"{actor_name} approved Task #{task_id}: {task_title}"
+    elif action.upper() == "REJECTED":
+        reason_text = f" (Reason: {reason})" if reason else ""
+        readable_action = f"{actor_name} rejected Task #{task_id}: {task_title}{reason_text}"
+    elif action.upper() == "SUBMITTED":
+        readable_action = f"{actor_name} submitted Task #{task_id}: {task_title} for approval"
+    else:
+        readable_action = f"{actor_name} updated Task #{task_id}: {task_title} to {new_status}"
+
+    details = {
+        "user_name": actor_name,
+        "user_role": role,
+        "task_id": task_id,
+        "task_title": task_title,
+        "previous_status": previous_status,
+        "new_status": new_status,
+        "project_id": project_id,
+        "reason": reason,
+        "comments": comments,
+        "summary": readable_action,
+    }
+
+    admin_log = AdminAuditLog(
+        user_id=user_id,
+        action=f"TASK_{action.upper()}",
+        resource_type="task",
+        resource_id=task_id,
+        status="success",
+        details=details,
+    )
+    db.add(admin_log)
+
+    try:
+        from app.models.audit_event import AuditEvent
+        proj_event = AuditEvent(
+            project_id=project_id,
+            actor_id=stakeholder_id,
+            event_type=f"TASK_{action.upper()}",
+            entity_type="task",
+            entity_id=task_id or 0,
+            description=readable_action,
+            changes={"previous_status": previous_status, "new_status": new_status, "reason": reason, "comments": comments},
+        )
+        db.add(proj_event)
+    except Exception:
+        pass
+
+    await db.flush()
+    return admin_log
+

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import {
@@ -13,6 +13,8 @@ import {
   Status,
   useRequest,
   Badge,
+  emitWorkflowUpdate,
+  useWorkflowListener,
 } from "@/components/ui";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -21,6 +23,9 @@ import {
 
 export function AdminOperationsDashboard({ user }: { user: any }) {
   const operations = useRequest(() => api.dashboard.operations(), []);
+
+  // Auto-refresh when any approval workflow event fires
+  useWorkflowListener(useCallback(() => { void operations.refresh(); }, []));
 
   if (operations.loading) {
     return <Loading text="Aggregating cross-project studio operations telemetry…" />;
@@ -93,10 +98,10 @@ export function AdminOperationsDashboard({ user }: { user: any }) {
           icon="⏱️"
         />
         <Metric
-          label="Portfolio Risk Exposure"
-          value={risks.length}
-          hint={`${risks.filter((r: any) => r.severity === "critical").length} critical mitigations active`}
-          icon="⚠️"
+          label="Approved Tasks"
+          value={tasks.approved ?? 0}
+          hint={`${tasks.rejected ?? 0} rejected · ${tasks.pending_approvals ?? 0} pending`}
+          icon="✅"
         />
       </div>
 
@@ -689,6 +694,23 @@ export function ClientDashboard({ projectId, user }: { projectId: number; user: 
 
 export function ManagementDashboard({ user }: { user: any }) {
   const management = useRequest(() => api.dashboard.management(), []);
+  const [updatingTask, setUpdatingTask] = useState<number | null>(null);
+
+  // Auto-refresh when any approval workflow event fires
+  useWorkflowListener(useCallback(() => { void management.refresh(); }, []));
+
+  const handleStatusChange = async (taskId: number, newStatus: string) => {
+    setUpdatingTask(taskId);
+    try {
+      await api.tasks.update(taskId, { status: newStatus });
+      emitWorkflowUpdate();
+      await management.refresh();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to update task status");
+    } finally {
+      setUpdatingTask(null);
+    }
+  };
 
   if (management.loading) {
     return <Loading text="Fetching your management task deliverables…" />;
@@ -806,12 +828,20 @@ export function ManagementDashboard({ user }: { user: any }) {
                     </td>
                     <td>
                       {!isReadOnly ? (
-                        <button
-                          className="button small ghost"
-                          onClick={() => alert(`Updating task: ${t.title}`)}
+                        <select
+                          className="input"
+                          value={t.status}
+                          disabled={updatingTask === t.id}
+                          onChange={(e) => void handleStatusChange(t.id, e.target.value)}
+                          style={{ padding: "4px 8px", fontSize: 12, minWidth: 120 }}
                         >
-                          Update Status
-                        </button>
+                          <option value="draft">Draft</option>
+                          <option value="not_started">Not Started</option>
+                          <option value="in_progress">In Progress</option>
+                          <option value="on_hold">On Hold</option>
+                          <option value="pending_approval">Pending Approval</option>
+                          <option value="completed">Completed</option>
+                        </select>
                       ) : (
                         <span className="muted" style={{ fontSize: 12 }}>Read-only</span>
                       )}

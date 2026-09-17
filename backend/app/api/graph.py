@@ -1,15 +1,20 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.deps import get_session
-from app.models import Task, Dependency, Stakeholder, Approval, ChangeRequest, Risk, Vendor, ProjectStakeholder
+from app.deps import get_session, get_current_user, verify_project_access
+from app.models import Task, Dependency, Stakeholder, Approval, ChangeRequest, Risk, Vendor, ProjectStakeholder, User
 from app.models.enums import RelationshipType
 
 router = APIRouter(prefix="/api/graph", tags=["graph"])
 
 
 @router.get("/{project_id}")
-async def get_graph_data(project_id: int, db: AsyncSession = Depends(get_session)):
+async def get_graph_data(
+    project_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    await verify_project_access(project_id, current_user, db)
     task_result = await db.execute(select(Task).where(Task.project_id == project_id))
     tasks = task_result.scalars().all()
 

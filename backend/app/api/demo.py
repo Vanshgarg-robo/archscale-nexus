@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from datetime import datetime, timedelta, timezone
-from app.deps import get_session
+from app.deps import get_session, get_current_user, require_not_viewer
 from app.models import (
     Project, ChangeRequest, Task, Dependency, Approval,
-    Stakeholder, Notification, HealthSnapshot
+    Stakeholder, Notification, HealthSnapshot, User
 )
 from app.models.enums import (
     ChangeRequestStatus, TaskStatus, ApprovalStatus, NotificationType, HealthStatus
@@ -15,7 +15,11 @@ router = APIRouter(prefix="/api/demo", tags=["demo"])
 
 
 @router.post("/kitchen-redesign")
-async def trigger_kitchen_redesign_demo(db: AsyncSession = Depends(get_session)):
+async def trigger_kitchen_redesign_demo(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    require_not_viewer(current_user)
     proj_result = await db.execute(select(Project).limit(1))
     project = proj_result.scalar_one_or_none()
     if not project:
@@ -179,7 +183,11 @@ async def trigger_kitchen_redesign_demo(db: AsyncSession = Depends(get_session))
 
 
 @router.post("/reset")
-async def reset_demo(db: AsyncSession = Depends(get_session)):
+async def reset_demo(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_session),
+):
+    require_not_viewer(current_user)
     proj_result = await db.execute(select(Project).limit(1))
     project = proj_result.scalar_one_or_none()
     if not project:
@@ -196,5 +204,5 @@ async def reset_demo(db: AsyncSession = Depends(get_session)):
                 t.status = TaskStatus.IN_PROGRESS
                 t.progress = 55
 
-    await db.flush()
+    await db.commit()
     return {"success": True, "message": "Demo scenario reset to baseline."}

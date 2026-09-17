@@ -1,0 +1,662 @@
+{
+  "matrix": {
+    "Admin Dashboard": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 403,
+      "operator@archscale.io": 403,
+      "analyst@archscale.io": 403,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 403,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 403,
+      "priya@elecdesign.com": 403,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Operations Dash": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 403,
+      "operator@archscale.io": 403,
+      "analyst@archscale.io": 403,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 403,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 403,
+      "priya@elecdesign.com": 403,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Management Dash": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 403,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Vendor Dash": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 403,
+      "operator@archscale.io": 403,
+      "analyst@archscale.io": 403,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 403,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 403,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Exec Dash (P1)": {
+      "No Auth": 401,
+      "admin@archscale.io": 403,
+      "viewer@archscale.io": 403,
+      "operator@archscale.io": 403,
+      "analyst@archscale.io": 403,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 403,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 403,
+      "priya@elecdesign.com": 403,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Exec Dash (P2)": {
+      "No Auth": 401,
+      "admin@archscale.io": 403,
+      "viewer@archscale.io": 403,
+      "operator@archscale.io": 403,
+      "analyst@archscale.io": 403,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 403,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 403,
+      "priya@elecdesign.com": 403,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 200
+    },
+    "List Projects": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 200
+    },
+    "Project P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Project P2": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 200
+    },
+    "Documents P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 403,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Documents P2": {
+      "No Auth": 401,
+      "admin@archscale.io": 403,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 200
+    },
+    "Tasks P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Tasks P2": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 200
+    },
+    "Approvals P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Approvals P2": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 200
+    },
+    "CR P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "CR P2": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 200
+    },
+    "Stakeholders P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Stakeholders P2": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 200
+    },
+    "Dependencies P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Dependencies P2": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 200
+    },
+    "Risks P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Risks P2": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 200
+    },
+    "Health P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Health P2": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 200
+    },
+    "AI Chat P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "AI Chat P2": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 200,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 403,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 403,
+      "vanshgargktl@gmail.com": 200
+    },
+    "Create Task P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 403,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Create Doc P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 403,
+      "viewer@archscale.io": 403,
+      "operator@archscale.io": 200,
+      "analyst@archscale.io": 200,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 200,
+      "amit@furnishcraft.com": 200,
+      "deepak@buildpro.com": 200,
+      "priya@elecdesign.com": 200,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    },
+    "Approve Task P1": {
+      "No Auth": 401,
+      "admin@archscale.io": 200,
+      "viewer@archscale.io": 403,
+      "operator@archscale.io": 403,
+      "analyst@archscale.io": 403,
+      "ananya@archscale.io": 200,
+      "arjun@archscale.io": 200,
+      "mohan@buildpro.com": 403,
+      "amit@furnishcraft.com": 403,
+      "deepak@buildpro.com": 403,
+      "priya@elecdesign.com": 403,
+      "rajiv@client.com": 200,
+      "vanshgargktl@gmail.com": 403
+    }
+  },
+  "pen_results": [
+    {
+      "test": "Rajiv (Client P1) -> GET /api/dashboard/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Rajiv (Client P1) -> GET /api/projects/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Rajiv (Client P1) -> GET /api/documents/project/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Rajiv (Client P1) -> GET /api/tasks/project/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Rajiv (Client P1) -> GET /api/approvals/pending/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Rajiv (Client P1) -> GET /api/change-requests/project/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Rajiv (Client P1) -> POST /api/ai/chat P2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Vansh (Client P2) -> GET /api/dashboard/1",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Vansh (Client P2) -> GET /api/projects/1",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Vansh (Client P2) -> GET /api/documents/project/1",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Vansh (Client P2) -> GET /api/tasks/project/1",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Vansh (Client P2) -> GET /api/approvals/pending/1",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Vansh (Client P2) -> GET /api/change-requests/project/1",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Vansh (Client P2) -> POST /api/ai/chat P1",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Amit (Vendor P1) -> GET /api/projects/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Amit (Vendor P1) -> GET /api/documents/project/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Amit (Vendor P1) -> GET /api/tasks/project/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Amit (Vendor P1) -> GET /api/approvals/pending/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Ananya (Architect P1) -> GET /api/projects/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Ananya (Architect P1) -> GET /api/documents/project/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Ananya (Architect P1) -> GET /api/tasks/project/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Ananya (Architect P1) -> GET /api/approvals/pending/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Ananya (Architect P1) -> POST /api/ai/chat P2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Mohan (Supervisor P1) -> GET /api/projects/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Mohan (Supervisor P1) -> GET /api/documents/project/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Mohan (Supervisor P1) -> GET /api/tasks/project/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Mohan (Supervisor P1) -> GET /api/approvals/pending/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Admin Isolation -> GET /api/dashboard/1",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Admin Isolation -> GET /api/dashboard/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Admin Isolation -> GET /api/documents/project/1",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Admin Isolation -> GET /api/documents/project/2",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Viewer -> POST /api/tasks",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Viewer -> POST /api/documents",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Viewer -> POST /api/change-requests",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Viewer -> POST /api/tasks/1/approve",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Viewer -> POST /api/demo/kitchen-redesign",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Viewer -> POST /api/demo/reset",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Client -> GET /api/admin/dashboard",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Vendor -> GET /api/admin/users",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Architect -> GET /api/admin/roles",
+      "status": 403,
+      "passed": true
+    },
+    {
+      "test": "Viewer -> GET /api/admin/dashboard",
+      "status": 403,
+      "passed": true
+    }
+  ],
+  "all_passed": true
+}

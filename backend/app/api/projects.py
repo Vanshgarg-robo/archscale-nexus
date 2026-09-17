@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.deps import get_session, get_current_user_optional, get_current_user
+from app.deps import get_session, get_current_user, verify_project_access
 from app.models import Project, ProjectStakeholder, User
 from app.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate
 
@@ -10,59 +10,45 @@ router = APIRouter(prefix="/api/projects", tags=["projects"])
 
 @router.get("", response_model=list[ProjectRead])
 async def list_projects(
-    current_user: User | None = Depends(get_current_user_optional),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_session),
 ):
     """List projects accessible to the current user.
     - Admin: All projects across the organization
-    - Management: Assigned projects
-    - Client: Only projects owned by or assigned to this client
-    - Vendor: Only projects where the vendor has assigned deliverables
-    - Guest: Returns public demo project
+    - Management: Assigned projects or studio portfolio
+    - Client: Strictly only projects owned by or assigned to this client
+    - Vendor / Contractor: Strictly only projects where the vendor has assigned deliverables
     """
-    if not current_user:
-        result = await db.execute(select(Project).limit(1))
+    if current_user.is_superadmin or current_user.role == "admin":
+        result = await db.execute(select(Project).order_by(Project.id))
         return result.scalars().all()
 
     if current_user.role == "client":
-        # Check projects where client_id == user.id OR linked via ProjectStakeholder
+        conditions = [Project.client_id == current_user.id]
         if current_user.stakeholder_id:
-            result = await db.execute(
-                select(Project)
-                .join(ProjectStakeholder, ProjectStakeholder.project_id == Project.id)
-                .where(
-                    (Project.client_id == current_user.id)
-                    | (ProjectStakeholder.stakeholder_id == current_user.stakeholder_id)
-                )
-                .distinct()
-            )
-            projects = result.scalars().all()
-            if projects:
-                return projects
+            conditions.append(ProjectStakeholder.stakeholder_id == current_user.stakeholder_id)
 
-        # Fallback: if user is client role, return projects where client_id is set or project 1
+        query = (
+            select(Project)
+            .outerjoin(ProjectStakeholder, ProjectStakeholder.project_id == Project.id)
+            .where(*conditions if len(conditions) == 1 else [conditions[0] | conditions[1]])
+            .distinct()
+            .order_by(Project.id)
+        )
+        result = await db.execute(query)
+        return result.scalars().all()
+
+    if current_user.stakeholder_id:
         result = await db.execute(
-            select(Project).where((Project.client_id == current_user.id) | (Project.id == 1))
+            select(Project)
+            .join(ProjectStakeholder, ProjectStakeholder.project_id == Project.id)
+            .where(ProjectStakeholder.stakeholder_id == current_user.stakeholder_id)
+            .distinct()
+            .order_by(Project.id)
         )
         return result.scalars().all()
 
-    elif current_user.role in ("vendor", "contractor"):
-        # Return projects assigned to vendor's stakeholder
-        if current_user.stakeholder_id:
-            result = await db.execute(
-                select(Project)
-                .join(ProjectStakeholder, ProjectStakeholder.project_id == Project.id)
-                .where(ProjectStakeholder.stakeholder_id == current_user.stakeholder_id)
-                .distinct()
-            )
-            projects = result.scalars().all()
-            if projects:
-                return projects
-
-        result = await db.execute(select(Project).limit(1))
-        return result.scalars().all()
-
-    # Admin and Management team see all studio projects
+    # Operations & platform oversight without specific stakeholder profile (analyst, operator, viewer)
     result = await db.execute(select(Project).order_by(Project.id))
     return result.scalars().all()
 
@@ -70,13 +56,10 @@ async def list_projects(
 @router.get("/{project_id}", response_model=ProjectRead)
 async def get_project(
     project_id: int,
-    current_user: User | None = Depends(get_current_user_optional),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_session),
 ):
-    result = await db.execute(select(Project).where(Project.id == project_id))
-    project = result.scalar_one_or_none()
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
+    project = await verify_project_access(project_id, current_user, db)
     return project
 
 
@@ -86,9 +69,9 @@ async def create_project(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_session),
 ):
-    if current_user.role not in ("admin", "project_manager"):
+    if current_user.role not in ("admin", "project_manager") and not current_user.is_superadmin:
         raise HTTPException(status_code=403, detail="Only Admins and Project Managers can create projects")
     project = Project(**data.model_dump())
     db.add(project)
-    await db.flush()
+    await db.commit()
     return project
