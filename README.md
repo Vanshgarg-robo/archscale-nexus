@@ -59,26 +59,9 @@ All pre-seeded demo accounts share the password: **`password123`** *(You can sig
 
 | Persona / Access | Role | Username | Email / Login ID | Password | Tailored Dashboard & Scope |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| 👤 **Client** | Principal Client | `rajiv` | `rajiv@client.com` | `password123` | **Executive Client Portal**: Isolated project view, drawing/document sign-offs, budget impact approvals |
-| 👔 **Management** | Project Manager | `arjun` | `arjun@archscale.io` | `password123` | **Coordination Command**: Full project oversight, blast-radius simulations, blocker resolution, approval workflows |
+| 👤 **Client (rajiv)** | Principal Client | `rajiv` | `rajiv@client.com` | `password123` | **Executive Client Portal**: Isolated project view, drawing/document sign-offs, budget impact approvals |
+| 👔 **Management (arjun)** | Project Manager | `arjun` | `arjun@archscale.io` | `password123` | **Coordination Command**: Full project oversight, blast-radius simulations, blocker resolution, approval workflows |
 | 📐 **Member (Ananya)** | Lead Architect | `ananya` | `ananya@archscale.io` | `password123` | **Design Governance**: Architectural drawings, revision reviews, drawing sign-offs, aesthetic change requests |
-
----
-
-#### 📋 Complete Pre-Seeded Persona Directory
-
-| Role | Name | Username | Email / Login ID | Password | Tailored Dashboard & Scope |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Admin** | Alexander Wright | `admin` | `admin@archscale.io` | `password123` | **Operations Command**: Tenant telemetry, security audit logs, user provisioning, global system health |
-| **Management** *(Project Manager)* | Arjun Reddy | `arjun` | `arjun@archscale.io` | `password123` | **Coordination Command**: Full project oversight, blast-radius simulations, blocker resolution, approval workflows |
-| **Team Member** *(Lead Architect)* | Ananya Sharma | `ananya` | `ananya@archscale.io` | `password123` | **Design Governance**: Architectural drawings, revision reviews, drawing sign-offs, aesthetic change requests |
-| **Electrical / MEP** | Priya Nair | `priya` | `priya@elecdesign.com` | `password123` | **Engineering Workspace**: Sub-floor conduits, Lutron automation, load calculations, MEP clash detection |
-| **General Contractor** | Deepak Singh | `deepak` | `deepak@buildpro.com` | `password123` | **Site Execution**: Slab screed, drywall staging, on-site contractor scheduling, physical blocker reporting |
-| **Client** *(Principal Owner)* | Rajiv Mehra | `rajiv` | `rajiv@client.com` | `password123` | **Executive Client Portal**: Isolated project view, drawing/document sign-offs, budget impact approvals |
-| **Custom Millwork Vendor** | Amit Gupta | `amit` | `amit@furnishcraft.com` | `password123` | **Vendor Portal**: Cabinetry deliverables, CAD releases, material lead-time tracking, hold notices |
-| **Site Supervisor** | Mohan Das | `mohan` | `mohan@buildpro.com` | `password123` | **Field Supervision**: Daily logs, site inspection checklists, material deliveries, real-time blocker pings |
-
-> 💡 **Quick Persona Switching**: Once logged in, use the **Role Switcher** in the header or logout to instantly experience the tailored UI for any of the 8 stakeholders.
 
 ---
 
