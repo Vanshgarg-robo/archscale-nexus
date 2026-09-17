@@ -53,18 +53,30 @@ ArchScale Nexus is deployed and live on Render:
 The platform comes pre-seeded with a comprehensive flagship project:  
 **"The Lumina Pavilion & Penthouse Residence"** *(5,500 sq ft luxury villa, 54 tasks, 26 dependencies, 18 approvals, 12 decisions, 12 risks, 4 change requests, 4 ingested communication records)*.
 
-All demo accounts share the password: **`password123`**
+All pre-seeded demo accounts share the password: **`password123`** *(You can sign in using either the **Username** or **Email**)*.
 
-| Role | Name | Email | Tailored Dashboard & Scope |
-| :--- | :--- | :--- | :--- |
-| **Admin** | Alexander Wright | `admin@archscale.io` | **Operations Command**: Tenant telemetry, security audit logs, user provisioning, global system health |
-| **Project Manager** | Arjun Reddy | `arjun@archscale.io` | **Coordination Command**: Full project oversight, blast-radius simulations, blocker resolution, approval workflows |
-| **Lead Architect** | Ananya Sharma | `ananya@archscale.io` | **Design Governance**: Architectural drawings, revision reviews, drawing sign-offs, aesthetic change requests |
-| **Electrical / MEP** | Priya Nair | `priya@elecdesign.com` | **Engineering Workspace**: Sub-floor conduits, Lutron automation, load calculations, MEP clash detection |
-| **General Contractor** | Deepak Singh | `deepak@buildpro.com` | **Site Execution**: Slab screed, drywall staging, on-site contractor scheduling, physical blocker reporting |
-| **Principal Client** | Rajiv Mehra | `rajiv@client.com` | **Executive Client Portal**: Isolated project view, drawing/document sign-offs, budget impact approvals |
-| **Custom Millwork Vendor** | Amit Gupta | `amit@furnishcraft.com` | **Vendor Portal**: Cabinetry deliverables, CAD releases, material lead-time tracking, hold notices |
-| **Site Supervisor** | Mohan Das | `mohan@buildpro.com` | **Field Supervision**: Daily logs, site inspection checklists, material deliveries, real-time blocker pings |
+#### 🎯 Quick Login Credentials (Client, Management & Team Member)
+
+| Persona / Access | Role | Username | Email / Login ID | Password | Tailored Dashboard & Scope |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 👤 **Client** | Principal Client | `rajiv` | `rajiv@client.com` | `password123` | **Executive Client Portal**: Isolated project view, drawing/document sign-offs, budget impact approvals |
+| 👔 **Management** | Project Manager | `arjun` | `arjun@archscale.io` | `password123` | **Coordination Command**: Full project oversight, blast-radius simulations, blocker resolution, approval workflows |
+| 📐 **Member (Ananya)** | Lead Architect | `ananya` | `ananya@archscale.io` | `password123` | **Design Governance**: Architectural drawings, revision reviews, drawing sign-offs, aesthetic change requests |
+
+---
+
+#### 📋 Complete Pre-Seeded Persona Directory
+
+| Role | Name | Username | Email / Login ID | Password | Tailored Dashboard & Scope |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Admin** | Alexander Wright | `admin` | `admin@archscale.io` | `password123` | **Operations Command**: Tenant telemetry, security audit logs, user provisioning, global system health |
+| **Management** *(Project Manager)* | Arjun Reddy | `arjun` | `arjun@archscale.io` | `password123` | **Coordination Command**: Full project oversight, blast-radius simulations, blocker resolution, approval workflows |
+| **Team Member** *(Lead Architect)* | Ananya Sharma | `ananya` | `ananya@archscale.io` | `password123` | **Design Governance**: Architectural drawings, revision reviews, drawing sign-offs, aesthetic change requests |
+| **Electrical / MEP** | Priya Nair | `priya` | `priya@elecdesign.com` | `password123` | **Engineering Workspace**: Sub-floor conduits, Lutron automation, load calculations, MEP clash detection |
+| **General Contractor** | Deepak Singh | `deepak` | `deepak@buildpro.com` | `password123` | **Site Execution**: Slab screed, drywall staging, on-site contractor scheduling, physical blocker reporting |
+| **Client** *(Principal Owner)* | Rajiv Mehra | `rajiv` | `rajiv@client.com` | `password123` | **Executive Client Portal**: Isolated project view, drawing/document sign-offs, budget impact approvals |
+| **Custom Millwork Vendor** | Amit Gupta | `amit` | `amit@furnishcraft.com` | `password123` | **Vendor Portal**: Cabinetry deliverables, CAD releases, material lead-time tracking, hold notices |
+| **Site Supervisor** | Mohan Das | `mohan` | `mohan@buildpro.com` | `password123` | **Field Supervision**: Daily logs, site inspection checklists, material deliveries, real-time blocker pings |
 
 > 💡 **Quick Persona Switching**: Once logged in, use the **Role Switcher** in the header or logout to instantly experience the tailored UI for any of the 8 stakeholders.
 
@@ -242,8 +254,12 @@ copy .env.example .env.local   # Windows
 
 # Start Next.js development server
 npm run dev
-```
 *Open `http://localhost:3000` in your browser to access ArchScale Nexus.*
+
+> 🔑 **Demo Login Quick-Reference**:
+> - **Client**: Username `rajiv` *(or `rajiv@client.com`)* • Password: `password123`
+> - **Management**: Username `arjun` *(or `arjun@archscale.io`)* • Password: `password123`
+> - **Member (Ananya)**: Username `ananya` *(or `ananya@archscale.io`)* • Password: `password123`
 
 ---
 
